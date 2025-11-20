@@ -1,0 +1,104 @@
+<style>
+  .navbar {
+    width: 100%;
+    padding: 15px 40px;
+    background: #fff;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-left a {
+    margin-right: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .nav-left a:hover {
+    color: #007bff;
+  }
+
+  /* USER AVATAR ALWAYS VISIBLE */
+  .user-menu {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: url('https://cdn-icons-png.flaticon.com/512/149/149071.png');
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* DROPDOWN */
+  .dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 48px;
+    background: #fff;
+    border: 1px solid #ddd;
+    width: 150px;
+    padding: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+  }
+
+  .dropdown a {
+    display: block;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+  }
+
+  .dropdown a:hover {
+    background: #f2f2f2;
+  }
+</style>
+
+<nav class="navbar">
+  
+  <!-- LEFT SIDE LINKS -->
+  <div class="nav-left">
+    <a href="/">Home</a>
+    <a href="/login">Login</a>
+    <a href="/signup">Signup</a>
+  </div>
+
+  <!-- RIGHT SIDE USER MENU -->
+  <div class="user-menu" onclick="toggleDropdown()">
+    <div class="user-avatar"></div>
+
+    <div class="dropdown" id="dropdownMenu">
+      <a href="/profile">Profile</a>
+      <a href="/settings">Settings</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+</nav>
+
+<script>
+  function toggleDropdown() {
+    const menu = document.getElementById("dropdownMenu");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+  }
+
+  // Close dropdown when clicked outside
+  document.addEventListener("click", function (e) {
+    const user = document.querySelector(".user-menu");
+    const drop = document.getElementById("dropdownMenu");
+
+    if (!user.contains(e.target)) {
+      drop.style.display = "none";
+    }
+  });
+</script>
