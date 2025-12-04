@@ -1,0 +1,176 @@
+<%- include("partials/navbar") %>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .glass {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(15px);
+      border-radius: 14px;
+    }
+
+    .progress-bar {
+      transition: width 0.5s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-purple-600 to-blue-500 min-h-screen">
+
+  <!-- NAVBAR -->
+  <%- include("partials/navbar") %>
+
+  <div class="max-w-6xl mx-auto p-6">
+
+    <!-- Title -->
+    <h1 class="text-4xl font-bold text-white text-center mb-8">
+      📊 Your Progress Tracker
+    </h1>
+
+    <!-- OVERALL STATS -->
+    <div class="grid md:grid-cols-3 gap-6 mb-10">
+
+      <!-- Card 1 -->
+      <div class="glass p-6 text-white">
+        <h2 class="text-xl font-bold mb-2">Overall Completion</h2>
+        <p class="text-4xl font-semibold">72%</p>
+        <p class="opacity-80 mt-2 text-sm">Keep going! You're doing great.</p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="glass p-6 text-white">
+        <h2 class="text-xl font-bold mb-2">Tasks Completed</h2>
+        <p class="text-4xl font-semibold">18 / 25</p>
+        <p class="opacity-80 mt-2 text-sm">Almost there!</p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="glass p-6 text-white">
+        <h2 class="text-xl font-bold mb-2">Daily Streak</h2>
+        <p class="text-4xl font-semibold">6 Days 🔥</p>
+        <p class="opacity-80 mt-2 text-sm">Don't break your streak!</p>
+      </div>
+
+    </div>
+
+    <!-- PROGRESS BARS SECTION -->
+    <div class="glass p-6 mb-10">
+
+      <h2 class="text-2xl text-white font-bold mb-6">📘 Roadmap Completion</h2>
+
+      <!-- Example Skill 1 -->
+      <div class="mb-6">
+        <div class="flex justify-between text-white mb-1">
+          <span>HTML Basics</span>
+          <span>90%</span>
+        </div>
+        <div class="w-full bg-white/30 rounded-full h-3">
+          <div class="bg-green-400 h-3 rounded-full progress-bar" style="width: 90%;"></div>
+        </div>
+      </div>
+
+      <!-- Example Skill 2 -->
+      <div class="mb-6">
+        <div class="flex justify-between text-white mb-1">
+          <span>CSS Styling</span>
+          <span>65%</span>
+        </div>
+        <div class="w-full bg-white/30 rounded-full h-3">
+          <div class="bg-yellow-300 h-3 rounded-full progress-bar" style="width: 65%;"></div>
+        </div>
+      </div>
+
+      <!-- Example Skill 3 -->
+      <div class="mb-6">
+        <div class="flex justify-between text-white mb-1">
+          <span>JavaScript Fundamentals</span>
+          <span>40%</span>
+        </div>
+        <div class="w-full bg-white/30 rounded-full h-3">
+          <div class="bg-red-400 h-3 rounded-full progress-bar" style="width: 40%;"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- WEEKLY PROGRESS -->
+    <div class="glass p-6 mb-10">
+      <h2 class="text-2xl text-white font-bold mb-4">📅 Weekly Learning Report</h2>
+
+      <div class="grid grid-cols-7 gap-4 text-center">
+
+        <div class="p-3 rounded-md bg-green-500 text-white">
+          Mon<br /><span class="text-xl font-semibold">✔</span>
+        </div>
+
+        <div class="p-3 rounded-md bg-green-500 text-white">
+          Tue<br /><span class="text-xl font-semibold">✔</span>
+        </div>
+
+        <div class="p-3 rounded-md bg-green-500 text-white">
+          Wed<br /><span class="text-xl font-semibold">✔</span>
+        </div>
+
+        <div class="p-3 rounded-md bg-yellow-400 text-white">
+          Thu<br /><span class="text-xl font-semibold">~</span>
+        </div>
+
+        <div class="p-3 rounded-md bg-green-500 text-white">
+          Fri<br /><span class="text-xl font-semibold">✔</span>
+        </div>
+
+        <div class="p-3 rounded-md bg-red-500 text-white">
+          Sat<br /><span class="text-xl font-semibold">✘</span>
+        </div>
+
+        <div class="p-3 rounded-md bg-green-500 text-white">
+          Sun<br /><span class="text-xl font-semibold">✔</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TASK LIST -->
+    <div class="glass p-6">
+
+      <h2 class="text-2xl text-white font-bold mb-6">📝 Tasks Summary</h2>
+
+      <ul class="space-y-4">
+
+        <li class="flex justify-between bg-white p-4 rounded-md shadow">
+          <div>
+            <h3 class="font-bold">Finish HTML Forms</h3>
+            <p class="text-gray-600 text-sm">Deadline: Tomorrow</p>
+          </div>
+          <span class="text-green-600 font-bold text-lg">Completed ✔</span>
+        </li>
+
+        <li class="flex justify-between bg-white p-4 rounded-md shadow">
+          <div>
+            <h3 class="font-bold">CSS Flexbox Practice</h3>
+            <p class="text-gray-600 text-sm">Deadline: 3 days</p>
+          </div>
+          <span class="text-yellow-500 font-bold text-lg">In Progress 🔄</span>
+        </li>
+
+        <li class="flex justify-between bg-white p-4 rounded-md shadow">
+          <div>
+            <h3 class="font-bold">Start JS Variables</h3>
+            <p class="text-gray-600 text-sm">Deadline: 1 week</p>
+          </div>
+          <span class="text-red-500 font-bold text-lg">Pending ⏳</span>
+        </li>
+
+      </ul>
+    </div>
+
+  </div>
+
+  <footer class="text-center text-white opacity-80 mt-12 pb-6">
+    © 2025 EduSetu — Progress Powered by AI
+  </footer>
+
+</body>
+</html>

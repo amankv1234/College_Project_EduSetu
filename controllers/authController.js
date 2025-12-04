@@ -17,3 +17,18 @@ exports.loginUser = async (req, res) => {
 
   res.redirect("/");
 };
+exports.roadmapPage = (req, res) => {
+  res.render("roadmap"); 
+};
+exports.hackthonPage = (req, res) => {
+  res.render("hackthon"); 
+};
+exports.progressPage = (req, res) => {
+  res.render("progress"); 
+};
+exports.chatPage = (req, res) => {
+  res.render("chat"); 
+};
+exports.testPage = (req, res) => {
+  res.render("test"); 
+};

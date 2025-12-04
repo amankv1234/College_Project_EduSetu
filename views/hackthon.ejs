@@ -1,0 +1,141 @@
+<%- include("partials/navbar") %>
+
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .glass {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(15px);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  </style>
+
+
+<body class="bg-gradient-to-br from-indigo-600 to-blue-500 min-h-screen">
+
+  <!-- NAVBAR -->
+  <%- include("partials/navbar") %>
+
+  <!-- MAIN PAGE CONTENT -->
+  <div class="p-6 max-w-7xl mx-auto">
+
+    <!-- PAGE TITLE -->
+    <h1 class="text-4xl font-bold text-white text-center mb-8">
+      🌐 Discover Hackathons & Internships
+    </h1>
+
+    <!-- SEARCH + FILTER SECTION -->
+    <div class="glass p-5 mb-8">
+      <h2 class="text-2xl text-white font-bold mb-4">Search Opportunities</h2>
+
+      <div class="grid md:grid-cols-3 gap-4">
+
+        <input type="text"
+          placeholder="🔍 Search keywords (e.g., Web Dev, AI, Blockchain)"
+          class="p-3 rounded-md w-full border" />
+
+        <select class="p-3 rounded-md w-full border">
+          <option>All Categories</option>
+          <option>Hackathons</option>
+          <option>Internships</option>
+          <option>Open Source</option>
+        </select>
+
+        <select class="p-3 rounded-md w-full border">
+          <option>Sort by: Deadline</option>
+          <option>Newest</option>
+          <option>Prize Pool</option>
+        </select>
+
+      </div>
+
+      <button class="mt-4 bg-indigo-700 hover:bg-indigo-900 text-white px-6 py-3 rounded-md font-semibold">
+        🔎 Apply Filters
+      </button>
+    </div>
+
+    <!-- OPPORTUNITIES SECTION -->
+    <h2 class="text-3xl text-white font-bold mb-4">🔥 Latest Opportunities</h2>
+
+    <div class="grid md:grid-cols-2 gap-8">
+
+      <!-- CARD 1 -->
+      <div class="glass p-6">
+        <h3 class="text-2xl text-white font-bold mb-2">Smart India Hackathon 2025</h3>
+        <p class="text-white opacity-90">Government of India — National Level</p>
+
+        <ul class="mt-4 text-white text-sm space-y-1">
+          <li>• Prize: ₹1,00,000</li>
+          <li>• Mode: Offline (Finalists)</li>
+          <li>• Theme: AI, Healthcare, Research</li>
+          <li>• Deadline: Jan 30, 2025</li>
+        </ul>
+
+        <button class="mt-4 w-full bg-green-600 hover:bg-green-800 text-white py-3 rounded-md">
+          View Details
+        </button>
+      </div>
+
+      <!-- CARD 2 -->
+      <div class="glass p-6">
+        <h3 class="text-2xl text-white font-bold mb-2">Google STEP Internship</h3>
+        <p class="text-white opacity-90">Google India — 10-12 week program</p>
+
+        <ul class="mt-4 text-white text-sm space-y-1">
+          <li>• Stipend: ₹80,000/month</li>
+          <li>• Mode: Hybrid</li>
+          <li>• Role: Software Engineer Intern</li>
+          <li>• Deadline: Feb 12, 2025</li>
+        </ul>
+
+        <button class="mt-4 w-full bg-green-600 hover:bg-green-800 text-white py-3 rounded-md">
+          Apply Now
+        </button>
+      </div>
+
+      <!-- CARD 3 -->
+      <div class="glass p-6">
+        <h3 class="text-2xl text-white font-bold mb-2">ETH India Hackathon</h3>
+        <p class="text-white opacity-90">Ethereum Foundation — Web3 Hack</p>
+
+        <ul class="mt-4 text-white text-sm space-y-1">
+          <li>• Prize Pool: $200,000</li>
+          <li>• Mode: In-Person (Bangalore)</li>
+          <li>• Theme: Blockchain, DeFi</li>
+          <li>• Deadline: March 5, 2025</li>
+        </ul>
+
+        <button class="mt-4 w-full bg-green-600 hover:bg-green-800 text-white py-3 rounded-md">
+          Register Now
+        </button>
+      </div>
+
+      <!-- CARD 4 -->
+      <div class="glass p-6">
+        <h3 class="text-2xl text-white font-bold mb-2">Microsoft Future Ready Internship</h3>
+        <p class="text-white opacity-90">Microsoft India — Remote</p>
+
+        <ul class="mt-4 text-white text-sm space-y-1">
+          <li>• Stipend: ₹50,000/month</li>
+          <li>• Mode: Remote</li>
+          <li>• Role: Developer Intern</li>
+          <li>• Deadline: Jan 18, 2025</li>
+        </ul>
+
+        <button class="mt-4 w-full bg-green-600 hover:bg-green-800 text-white py-3 rounded-md">
+          Apply Now
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer class="text-center text-white mt-16 opacity-80 pb-6">
+    © 2025 EduSetu — Opportunities Powered by AI
+  </footer>
+
+</body>
+</html>

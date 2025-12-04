@@ -1,0 +1,113 @@
+<%- include("partials/navbar") %>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  .glass {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+</style>
+
+<body class="bg-gradient-to-br from-indigo-600 to-blue-400 min-h-screen p-6">
+
+  <!-- Page Title -->
+  <h1 class="text-4xl font-bold text-white mb-6 text-center">
+    🚀 Your Learning Roadmaps
+  </h1>
+
+  <!-- Create New Roadmap Section -->
+  <div class="max-w-2xl mx-auto glass p-6 mb-10">
+    <h2 class="text-2xl font-semibold text-white mb-4">Create New Roadmap</h2>
+
+    <form class="space-y-4">
+
+      <div>
+        <label class="text-white">Goal</label>
+        <input type="text" placeholder="Example: Become Full Stack Developer"
+          class="w-full p-3 rounded-md border border-gray-300">
+      </div>
+
+      <div>
+        <label class="text-white">Skills (comma separated)</label>
+        <input type="text" placeholder="HTML, CSS, JavaScript"
+          class="w-full p-3 rounded-md border border-gray-300">
+      </div>
+
+      <button
+        class="w-full bg-indigo-700 hover:bg-indigo-900 text-white py-3 rounded-md font-semibold transition">
+        ➕ Generate Roadmap
+      </button>
+
+    </form>
+  </div>
+
+  <!-- Saved Roadmaps -->
+  <h2 class="text-3xl text-white font-bold mb-4">📚 Your Saved Roadmaps</h2>
+
+  <!-- Static Example Cards (NO BACKEND REQUIRED) -->
+  <div class="grid sm:grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Roadmap Card 1 -->
+    <div class="glass p-5">
+      <h3 class="text-xl font-bold text-white mb-2">1. Full Stack Developer Roadmap</h3>
+
+      <p class="text-white text-sm mb-3"><strong>Skills:</strong> HTML, CSS, JavaScript, React, Node.js</p>
+
+      <ul class="space-y-3">
+
+        <li class="bg-white p-3 rounded-md shadow">
+          <p class="font-semibold">Learn Basics</p>
+          <p class="text-sm text-gray-600">Start with fundamentals</p>
+          <span class="text-xs px-2 py-1 bg-indigo-200 rounded">Duration: 1 week</span>
+          <span class="text-xs px-2 py-1 bg-red-300 rounded">pending</span>
+        </li>
+
+        <li class="bg-white p-3 rounded-md shadow">
+          <p class="font-semibold">Practice Exercises</p>
+          <p class="text-sm text-gray-600">Solve coding exercises</p>
+          <span class="text-xs px-2 py-1 bg-indigo-200 rounded">Duration: 10 days</span>
+          <span class="text-xs px-2 py-1 bg-green-300 rounded">completed</span>
+        </li>
+
+        <li class="bg-white p-3 rounded-md shadow">
+          <p class="font-semibold">Build Mini Projects</p>
+          <p class="text-sm text-gray-600">Create small functional apps</p>
+          <span class="text-xs px-2 py-1 bg-indigo-200 rounded">Duration: 2 weeks</span>
+          <span class="text-xs px-2 py-1 bg-yellow-300 rounded">in-progress</span>
+        </li>
+
+      </ul>
+    </div>
+
+    <!-- Roadmap Card 2 -->
+    <div class="glass p-5">
+      <h3 class="text-xl font-bold text-white mb-2">2. DSA Mastery Roadmap</h3>
+
+      <p class="text-white text-sm mb-3"><strong>Skills:</strong> Arrays, Linked List, Trees, Graphs</p>
+
+      <ul class="space-y-3">
+
+        <li class="bg-white p-3 rounded-md shadow">
+          <p class="font-semibold">Arrays Basics</p>
+          <p class="text-sm text-gray-600">Solve 50 array questions</p>
+          <span class="text-xs px-2 py-1 bg-indigo-200 rounded">Duration: 1 week</span>
+          <span class="text-xs px-2 py-1 bg-red-300 rounded">pending</span>
+        </li>
+
+        <li class="bg-white p-3 rounded-md shadow">
+          <p class="font-semibold">Linked Lists</p>
+          <p class="text-sm text-gray-600">Implement LL operations</p>
+          <span class="text-xs px-2 py-1 bg-indigo-200 rounded">Duration: 5 days</span>
+          <span class="text-xs px-2 py-1 bg-green-300 rounded">completed</span>
+        </li>
+
+      </ul>
+    </div>
+
+  </div>
+
+</body>
+</html>
