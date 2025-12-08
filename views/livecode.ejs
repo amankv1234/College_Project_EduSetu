@@ -1,0 +1,71 @@
+<%- include("partials/navbar") %>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+        #editor {
+            width: 100%;
+            height: 300px;
+            padding: 10px;
+            background: #1e1e1e;
+            color: #fff;
+            font-family: monospace;
+            font-size: 16px;
+            border-radius: 10px;
+        }
+        #output {
+            width: 100%;
+            height: 200px;
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+        select, button {
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Live Coding Environment</h2>
+
+<select id="language">
+    <option value="52">C++</option>
+    <option value="62">Java</option>
+    <option value="63">JavaScript</option>
+    <option value="71">Python</option>
+</select>
+
+<textarea id="editor">print("Hello Aman")</textarea>
+
+<br>
+<button onclick="runCode()">Run Code</button>
+
+<pre id="output">Output will appear here...</pre>
+
+<script>
+async function runCode() {
+    const code = document.getElementById("editor").value;
+    const lang = document.getElementById("language").value;
+
+    const res = await fetch("/api/run-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, lang })
+    });
+
+    const data = await res.json();
+    document.getElementById("output").innerText = data.output;
+}
+</script>
+
+</body>
+</html>

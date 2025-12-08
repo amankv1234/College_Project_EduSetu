@@ -1,54 +1,74 @@
 <style>
+  /* RESET */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+
   /* NAVBAR MAIN */
   .navbar {
     width: 100%;
-    padding: 15px 40px;
+    height: 50px;
     background: #ffffff;
-    border-bottom: 1px solid #e5e5e5;
+    padding: 0 40px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    position: fixed; 
+    justify-content: space-between;
+    border-bottom: 1px solid #e6e6e6;
+    position: fixed;
     top: 0;
     left: 0;
-    z-index: 999;
+    z-index: 2000;
   }
 
-  /* LEFT MENU BUTTONS */
-  .nav-left a button {
-    padding: 10px 20px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    margin-right: 15px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
+  /* LOGO */
+  .logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: #007bff;
+    letter-spacing: .5px;
   }
 
-  .nav-left a button:hover {
-    background: #0056d2;
+  /* MENU LEFT */
+  .nav-left {
+    display: flex;
+    gap: 18px;
+    margin-left: 30px;
   }
 
   .nav-left a {
     text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    padding: 8px 14px;
+    border-radius: 6px;
+    transition: 0.3s ease;
   }
 
-  /* USER MENU */
+  .nav-left a:hover {
+    background: #007bff15;
+    color: #007bff;
+  }
+
+  /* USER MENU RIGHT */
   .user-menu {
     display: flex;
     align-items: center;
-    cursor: pointer;
     position: relative;
-    padding-right: 60px; /* dropdown ko right corner se chipakne se roke */
-}
+    cursor: pointer;
+  }
 
+  .username {
+    margin-right: 12px;
+    font-weight: 500;
+  }
 
   .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     background: url('https://cdn-icons-png.flaticon.com/512/149/149071.png');
     background-size: cover;
@@ -56,65 +76,80 @@
     border: 2px solid #007bff;
   }
 
-  /* DROPDOWN */
+  /* DROPDOWN MENU */
   .dropdown {
     display: none;
     position: absolute;
+    top: 60px;
     right: 0;
-    top: 50px;
+    width: 170px;
     background: #fff;
+    border-radius: 10px;
+    padding: 8px 0;
     border: 1px solid #ddd;
-    width: 160px;
-    padding: 10px 0;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-    z-index: 1000;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.1);
+    animation: fadeIn 0.2s ease;
   }
 
   .dropdown a {
     display: block;
-    padding: 12px 15px;
-    color: #333;
+    padding: 12px 18px;
     text-decoration: none;
-    font-size: 14px;
+    color: #333;
+    font-size: 15px;
+    transition: 0.3s ease;
   }
 
   .dropdown a:hover {
-    background: #f2f2f2;
+    background: #f5f7ff;
+    color: #007bff;
   }
 
-  @media(max-width: 500px) {
-    .nav-left a button {
-      padding: 8px 14px;
-      margin-right: 10px;
-      font-size: 12px;
+  /* FADE ANIMATION */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* MOBILE RESPONSIVE */
+  @media (max-width: 700px) {
+    .nav-left {
+      display: none;
     }
     .navbar {
-      padding: 10px 20px;
+      padding: 0 20px;
     }
   }
 </style>
 
 <nav class="navbar">
-  
-  <!-- LEFT SIDE BUTTON MENU -->
+
+  <div class="logo">EduSetu</div>
+
   <div class="nav-left">
-    <a href="/"><button>Home</button></a>
-    <a href="/login"><button>Login</button></a>
-    <a href="/signup"><button>Signup</button></a>
+    <a href="/">Home</a>
+    <a href="/roadmap">Roadmaps</a>
+    <a href="/hackthon">Hackathons</a>
+    <a href="/livecode">Live Code</a>
+    <a href="/internships">Internships</a>
   </div>
 
-  <!-- RIGHT SIDE USER MENU -->
   <div class="user-menu" onclick="toggleDropdown()">
+    <span class="username">User</span>
     <div class="user-avatar"></div>
 
     <div class="dropdown" id="dropdownMenu">
       <a href="/profile">Profile</a>
       <a href="/settings">Settings</a>
-      <a href="/logout">Logout</a>
+      <a href="/">Logout</a>
     </div>
   </div>
-
 </nav>
 
 <script>
@@ -124,11 +159,11 @@
   }
 
   document.addEventListener("click", function (e) {
-    const user = document.querySelector(".user-menu");
-    const drop = document.getElementById("dropdownMenu");
+    const userMenu = document.querySelector(".user-menu");
+    const dropdown = document.getElementById("dropdownMenu");
 
-    if (!user.contains(e.target)) {
-      drop.style.display = "none";
+    if (!userMenu.contains(e.target)) {
+      dropdown.style.display = "none";
     }
   });
 </script>

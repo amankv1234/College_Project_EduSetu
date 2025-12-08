@@ -1,113 +1,191 @@
 <%- include("partials/navbar") %>
 
-<script src="https://cdn.tailwindcss.com"></script>
 
-<style>
-  .glass {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(15px);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #f4f7fc;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1100px;
+      margin: auto;
+      margin-top: 20px;
+      padding-top: 40px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    /* Form */
+    .form-box {
+      background: #ffffff;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      margin-bottom: 40px;
+    }
+
+    .form-box input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+
+    .form-box button {
+      margin-top: 15px;
+      background: #4b79ff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+    }
+
+    /* Roadmap Cards */
+    .roadmap-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .card h3 {
+      color: #4b79ff;
+    }
+
+    .step {
+      background: #f1f3ff;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+
+    .completed {
+      background: #cfffd2;
+      text-decoration: line-through;
+      color: #1f7a1f;
+    }
+
+    .complete-btn {
+      background: #22c55e;
+      color: white;
+      padding: 7px 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <h1>Your Roadmaps</h1>
+
+    <!-- Create Roadmap -->
+    <div class="form-box">
+      <h2>Create New Roadmap</h2>
+      <input id="goal" type="text" placeholder="Enter your goal (e.g., Web Developer)">
+      <input id="skills" type="text" placeholder="Skills (comma separated)">
+      <button onclick="createRoadmap()">Add Roadmap</button>
+    </div>
+
+    <!-- Saved Roadmaps -->
+    <div class="roadmap-container" id="roadmaps"></div>
+  </div>
+
+
+<script>
+  let roadmaps = JSON.parse(localStorage.getItem("roadmaps") || "[]");
+
+  function save() {
+    localStorage.setItem("roadmaps", JSON.stringify(roadmaps));
+    display();
   }
-</style>
 
-<body class="bg-gradient-to-br from-indigo-600 to-blue-400 min-h-screen p-6">
+  function createRoadmap() {
+    let goal = document.getElementById("goal").value;
+    let skills = document.getElementById("skills").value.split(",").map(s => s.trim());
 
-  <!-- Page Title -->
-  <h1 class="text-4xl font-bold text-white mb-6 text-center">
-    🚀 Your Learning Roadmaps
-  </h1>
+    if (!goal) return alert("Enter a goal!");
 
-  <!-- Create New Roadmap Section -->
-  <div class="max-w-2xl mx-auto glass p-6 mb-10">
-    <h2 class="text-2xl font-semibold text-white mb-4">Create New Roadmap</h2>
+    let newRoadmap = {
+      id: Date.now(),
+      goal,
+      skills,
+      steps: [
+        { title: "Learn Basics", desc: "Start with fundamentals", duration: "1 week", done: false },
+        { title: "Practice Exercises", desc: "Solve coding exercises", duration: "10 days", done: false },
+        { title: "Build Projects", desc: "Create mini projects", duration: "2 weeks", done: false }
+      ]
+    };
 
-    <form class="space-y-4">
+    roadmaps.push(newRoadmap);
+    save();
 
-      <div>
-        <label class="text-white">Goal</label>
-        <input type="text" placeholder="Example: Become Full Stack Developer"
-          class="w-full p-3 rounded-md border border-gray-300">
-      </div>
+    document.getElementById("goal").value = "";
+    document.getElementById("skills").value = "";
+  }
 
-      <div>
-        <label class="text-white">Skills (comma separated)</label>
-        <input type="text" placeholder="HTML, CSS, JavaScript"
-          class="w-full p-3 rounded-md border border-gray-300">
-      </div>
 
-      <button
-        class="w-full bg-indigo-700 hover:bg-indigo-900 text-white py-3 rounded-md font-semibold transition">
-        ➕ Generate Roadmap
-      </button>
+  function markStep(roadmapId, index) {
+    let roadmap = roadmaps.find(r => r.id === roadmapId);
+    roadmap.steps[index].done = true;
+    save();
+  }
 
-    </form>
-  </div>
 
-  <!-- Saved Roadmaps -->
-  <h2 class="text-3xl text-white font-bold mb-4">📚 Your Saved Roadmaps</h2>
+  function display() {
+    let box = document.getElementById("roadmaps");
+    box.innerHTML = "";
 
-  <!-- Static Example Cards (NO BACKEND REQUIRED) -->
-  <div class="grid sm:grid-cols-1 md:grid-cols-2 gap-6">
+    roadmaps.forEach(roadmap => {
+      let card = document.createElement("div");
+      card.className = "card";
 
-    <!-- Roadmap Card 1 -->
-    <div class="glass p-5">
-      <h3 class="text-xl font-bold text-white mb-2">1. Full Stack Developer Roadmap</h3>
+      card.innerHTML += `<h3>${roadmap.goal}</h3>`;
+      card.innerHTML += `<p><strong>Skills:</strong> ${roadmap.skills.join(", ") || "None"}</p>`;
+      card.innerHTML += `<h4>Steps:</h4>`;
 
-      <p class="text-white text-sm mb-3"><strong>Skills:</strong> HTML, CSS, JavaScript, React, Node.js</p>
+      roadmap.steps.forEach((step, i) => {
+        card.innerHTML += `
+          <div class="step ${step.done ? 'completed' : ''}">
+            <strong>${step.title}</strong>
+            <p>${step.desc}</p>
+            <p>⏳ ${step.duration}</p>
 
-      <ul class="space-y-3">
+            ${!step.done ? 
+              `<button class="complete-btn" onclick="markStep(${roadmap.id}, ${i})">Mark Completed</button>`
+            : `<strong>✔ Completed</strong>`}
+          </div>
+        `;
+      });
 
-        <li class="bg-white p-3 rounded-md shadow">
-          <p class="font-semibold">Learn Basics</p>
-          <p class="text-sm text-gray-600">Start with fundamentals</p>
-          <span class="text-xs px-2 py-1 bg-indigo-200 rounded">Duration: 1 week</span>
-          <span class="text-xs px-2 py-1 bg-red-300 rounded">pending</span>
-        </li>
+      box.appendChild(card);
+    });
+  }
 
-        <li class="bg-white p-3 rounded-md shadow">
-          <p class="font-semibold">Practice Exercises</p>
-          <p class="text-sm text-gray-600">Solve coding exercises</p>
-          <span class="text-xs px-2 py-1 bg-indigo-200 rounded">Duration: 10 days</span>
-          <span class="text-xs px-2 py-1 bg-green-300 rounded">completed</span>
-        </li>
-
-        <li class="bg-white p-3 rounded-md shadow">
-          <p class="font-semibold">Build Mini Projects</p>
-          <p class="text-sm text-gray-600">Create small functional apps</p>
-          <span class="text-xs px-2 py-1 bg-indigo-200 rounded">Duration: 2 weeks</span>
-          <span class="text-xs px-2 py-1 bg-yellow-300 rounded">in-progress</span>
-        </li>
-
-      </ul>
-    </div>
-
-    <!-- Roadmap Card 2 -->
-    <div class="glass p-5">
-      <h3 class="text-xl font-bold text-white mb-2">2. DSA Mastery Roadmap</h3>
-
-      <p class="text-white text-sm mb-3"><strong>Skills:</strong> Arrays, Linked List, Trees, Graphs</p>
-
-      <ul class="space-y-3">
-
-        <li class="bg-white p-3 rounded-md shadow">
-          <p class="font-semibold">Arrays Basics</p>
-          <p class="text-sm text-gray-600">Solve 50 array questions</p>
-          <span class="text-xs px-2 py-1 bg-indigo-200 rounded">Duration: 1 week</span>
-          <span class="text-xs px-2 py-1 bg-red-300 rounded">pending</span>
-        </li>
-
-        <li class="bg-white p-3 rounded-md shadow">
-          <p class="font-semibold">Linked Lists</p>
-          <p class="text-sm text-gray-600">Implement LL operations</p>
-          <span class="text-xs px-2 py-1 bg-indigo-200 rounded">Duration: 5 days</span>
-          <span class="text-xs px-2 py-1 bg-green-300 rounded">completed</span>
-        </li>
-
-      </ul>
-    </div>
-
-  </div>
+  display();
+</script>
 
 </body>
 </html>

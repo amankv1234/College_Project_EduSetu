@@ -1,321 +1,284 @@
+<%- include("partials/navbar") %>
 
-
-
-  <!-- Tailwind CDN -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- ADD YOUR GEMINI API KEY HERE -->
+  <script>
+    const GEMINI_API_KEY = "AIzaSyBtNccIBw63zaK9x7doYnECIgCCE_5LZXI"; 
+  </script>
+
   <style>
-    /* small custom overrides */
-    .chat-scroll {
-      max-height: 60vh;
-      overflow-y: auto;
+    .glass {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
     }
-    .bubble {
-      word-wrap: break-word;
-      white-space: pre-wrap;
-    }
+    .chat-scroll { max-height: 60vh; overflow-y: auto; }
+    .bubble { word-wrap: break-word; white-space: pre-wrap; }
     .typing-dot {
-      display:inline-block;
-      width:8px;
-      height:8px;
-      background:rgba(255,255,255,0.9);
-      border-radius:50%;
-      margin-right:6px;
-      animation: blink 1s infinite;
+      display:inline-block;width:8px;height:8px;
+      background:white;border-radius:50%;
+      margin-right:6px;animation: blink 1s infinite;
     }
-    .typing-dot:nth-child(2) { animation-delay: .2s }
-    .typing-dot:nth-child(3) { animation-delay: .4s }
+    .typing-dot:nth-child(2){ animation-delay:.2s }
+    .typing-dot:nth-child(3){ animation-delay:.4s }
     @keyframes blink {
-      0% { opacity:.2; transform: translateY(0) }
-      50% { opacity:1; transform: translateY(-4px) }
-      100% { opacity:.2; transform: translateY(0) }
+      0%{opacity:.2; transform: translateY(0)}
+      50%{opacity:1; transform: translateY(-4px)}
+      100%{opacity:.2; transform: translateY(0)}
     }
-    /* make sure textarea grows nicely */
-    textarea { resize: none; }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 to-indigo-700 min-h-screen text-slate-900">
-  <!-- NAVBAR (keeps top like your other pages) -->
-  <%- include("partials/navbar") %>
 
-  <main class="max-w-6xl mx-auto py-8 px-4">
-    <div class="grid lg:grid-cols-3 gap-8">
+<body class="bg-gradient-to-br from-slate-900 to-indigo-800 min-h-screen">
 
-      <!-- LEFT: Controls / Quick prompts -->
-      <section class="lg:col-span-1 space-y-6">
-        <div class="glass p-5">
-          <h2 class="text-xl font-bold text-white">AI Chat Assistant</h2>
-          <p class="text-sm text-white/80 mt-1">Ask anything about career, placements, coding, or your roadmap.</p>
-        </div>
+<main class="max-w-7xl mx-auto py-8 px-4 grid lg:grid-cols-3 gap-6">
 
-        <div class="glass p-5">
-          <h3 class="text-sm font-semibold text-white mb-2">Quick Prompts</h3>
-          <div class="flex flex-col gap-2">
-            <button class="quick-btn p-2 text-sm bg-white/10 text-white rounded" data-prompt="Give me a 1-month learning plan for web development.">1-month web dev plan</button>
-            <button class="quick-btn p-2 text-sm bg-white/10 text-white rounded" data-prompt="What topics should I practice to improve DSA for placements?">DSA topics for placements</button>
-            <button class="quick-btn p-2 text-sm bg-white/10 text-white rounded" data-prompt="How to prepare for internships in AI/ML?">Internship: AI/ML</button>
-            <button class="quick-btn p-2 text-sm bg-white/10 text-white rounded" data-prompt="Suggest project ideas for my portfolio as a 2nd year CS student.">Project ideas (portfolio)</button>
-          </div>
-        </div>
+  <!-- ---------------- LEFT PANEL ---------------- -->
+  <section class="lg:col-span-1 space-y-6">
 
-        <div class="glass p-5">
-          <h3 class="text-sm font-semibold text-white mb-2">Model & Settings (UI only)</h3>
-          <label class="text-xs text-white/80">Model</label>
-          <select id="modelSelect" class="w-full mt-2 p-2 rounded bg-white/10 text-white">
-            <option value="gpt-4o-mini" selected>gpt-4o-mini (recommended)</option>
-            <option value="gpt-4o">gpt-4o</option>
-            <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-          </select>
-
-          <label class="text-xs text-white/80 mt-4 block">Temperature: <span id="tempVal">0.7</span></label>
-          <input id="temp" type="range" min="0" max="1" step="0.1" value="0.7" class="w-full">
-
-          <div class="flex gap-2 mt-4">
-            <button id="clearBtn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded">Clear Chat</button>
-            <button id="downloadBtn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded">Download</button>
-          </div>
-
-          <p class="text-xs text-white/70 mt-3">Note: Do not call OpenAI directly from browser — proxy via your backend to keep API key secret. See integration notes below.</p>
-        </div>
-
-        <div class="glass p-4 text-white/80 text-xs">
-          <h4 class="font-semibold text-white">Integration notes (short)</h4>
-          <ol class="list-decimal ml-5 mt-2 space-y-1">
-            <li>Implement a backend endpoint (e.g. <code>/api/ai</code>) to forward requests to OpenAI.</li>
-            <li>From UI, send POST to your backend with { message, model, temperature }.</li>
-            <li>Backend calls OpenAI and returns the assistant reply JSON to UI.</li>
-            <li>This page contains sample fetch code (see bottom script).</li>
-          </ol>
-        </div>
-      </section>
-
-      <!-- RIGHT: Chat area -->
-      <section class="lg:col-span-2 flex flex-col gap-4">
-
-        <!-- Chat container -->
-        <div class="glass p-4 flex-1 flex flex-col">
-          <div class="flex items-center justify-between mb-3">
-            <div>
-              <h3 class="text-lg font-semibold text-white">EduSetu Assistant</h3>
-              <p class="text-xs text-white/80">Career & coding help · Ready to answer</p>
-            </div>
-            <div class="text-xs text-white/70">Status: <span id="status">Ready</span></div>
-          </div>
-
-          <!-- MESSAGE LIST -->
-          <div id="messages" class="chat-scroll space-y-3 overflow-y-auto pr-2 pb-2">
-            <!-- Example static messages (frontend-only) -->
-            <div class="flex items-start gap-3">
-              <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center">A</div>
-              <div class="bubble bg-white p-3 rounded-lg shadow max-w-[80%]">
-                <div class="text-sm font-semibold">Hi Aman, I'm EduSetu Assistant 👋</div>
-                <div class="text-xs text-slate-600 mt-1">Ask me about career plans, placements, or coding help.</div>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-3 justify-end">
-              <div class="bubble bg-indigo-600 text-white p-3 rounded-lg shadow max-w-[80%]">
-                <div class="text-sm">Show me a weekly plan to learn DSA.</div>
-              </div>
-              <div class="w-9 h-9 rounded-full bg-indigo-400 flex items-center justify-center text-white">U</div>
-            </div>
-          </div>
-
-          <!-- typing indicator (hidden when not used) -->
-          <div id="typing" class="hidden mt-2 text-sm text-white/90">
-            <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
-            <span class="ml-2">Assistant is typing…</span>
-          </div>
-
-          <!-- Input area -->
-          <form id="chatForm" class="mt-4 grid grid-cols-12 gap-2 items-end">
-            <div class="col-span-12 md:col-span-10">
-              <textarea id="inputMsg" rows="1" placeholder="Type your question here... (or use quick prompts)" 
-                class="w-full p-3 rounded-md resize-none focus:outline-none" required></textarea>
-            </div>
-
-            <div class="col-span-12 md:col-span-2 flex gap-2">
-              <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-800 text-white py-3 px-4 rounded">Send</button>
-            </div>
-
-            <div class="col-span-12 text-xs text-white/70 mt-2">
-              Tip: Use concise prompts, or ask follow-ups like "Make it shorter", "More examples", "Add code".
-            </div>
-          </form>
-        </div>
-
-        <!-- Conversation controls / history preview -->
-        <div class="glass p-4 flex gap-4 items-center justify-between">
-          <div class="text-white/80 text-sm">Local conversation stored in this session only.</div>
-          <div class="flex gap-2">
-            <button id="exportTxt" class="px-4 py-2 bg-white/10 text-white rounded">Export TXT</button>
-            <button id="copyAll" class="px-4 py-2 bg-white/10 text-white rounded">Copy Chat</button>
-          </div>
-        </div>
-
-      </section>
+    <!-- INTRO -->
+    <div class="glass p-6 text-white">
+      <h2 class="text-2xl font-bold">EduSetu AI Assistant 🤖</h2>
+      <p class="text-sm mt-1 opacity-80">
+        Study help · Coding help · Career guidance · DSA · Projects
+      </p>
     </div>
-  </main>
 
-  <script>
-    // -------------------------
-    // Frontend-only chat behavior
-    // -------------------------
-    const messagesEl = document.getElementById('messages');
-    const chatForm = document.getElementById('chatForm');
-    const inputMsg = document.getElementById('inputMsg');
-    const typingEl = document.getElementById('typing');
-    const statusEl = document.getElementById('status');
-    const tempSlider = document.getElementById('temp');
-    const tempVal = document.getElementById('tempVal');
-    const modelSelect = document.getElementById('modelSelect');
+    <!-- QUICK PROMPTS -->
+    <div class="glass p-5 text-white">
+      <h3 class="text-lg font-semibold mb-3">⚡ Quick Prompts</h3>
 
-    tempSlider.addEventListener('input', () => tempVal.textContent = tempSlider.value);
+      <div class="grid grid-cols-1 gap-2">
+        <button class="quick p-2 rounded bg-white/10" data-p="Create a 1-month roadmap for full stack dev.">Full-Stack Roadmap</button>
+        <button class="quick p-2 rounded bg-white/10" data-p="Give me 10 DSA problems I must solve.">DSA Problems</button>
+        <button class="quick p-2 rounded bg-white/10" data-p="Suggest unique project ideas for portfolio.">Project Ideas</button>
+        <button class="quick p-2 rounded bg-white/10" data-p="Guide me for internship preparation.">Internship Prep</button>
+      </div>
+    </div>
 
-    // Helper: add message bubble
-    function appendMessage({ role, text }) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'flex items-start gap-3 ' + (role === 'user' ? 'justify-end' : '');
-      const avatar = document.createElement('div');
-      avatar.className = 'w-9 h-9 rounded-full flex items-center justify-center ' + (role === 'user' ? 'bg-indigo-400 text-white' : 'bg-slate-100');
-      avatar.textContent = role === 'user' ? 'U' : 'A';
+    <!-- SETTINGS -->
+    <div class="glass p-5 text-white">
+      <h3 class="text-lg font-semibold mb-3">⚙️ Settings</h3>
 
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble p-3 rounded-lg shadow max-w-[80%] ' + (role === 'user' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-800');
-      bubble.innerText = text;
+      <label>Model</label>
+      <select id="model" class="w-full p-2 mt-1 rounded bg-white/10">
+        <option value="gemini-pro">Gemini Pro (recommended)</option>
+        <option value="gemini-1.5-flash">Gemini Flash</option>
+      </select>
 
-      if (role === 'user') {
-        wrapper.appendChild(bubble);
-        wrapper.appendChild(avatar);
-      } else {
-        wrapper.appendChild(avatar);
-        wrapper.appendChild(bubble);
-      }
+      <label class="mt-4 block">Temperature: <span id="tempVal">0.7</span></label>
+      <input id="temp" type="range" min="0" max="1" value="0.7" step="0.1" class="w-full">
 
-      messagesEl.appendChild(wrapper);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
+      <!-- Memory toggle -->
+      <div class="flex items-center gap-2 mt-4">
+        <input id="memoryToggle" type="checkbox" class="w-4 h-4">
+        <label for="memoryToggle">Enable Memory (future backend)</label>
+      </div>
 
-    // Simulated assistant response (when backend not connected)
-    function simulatedReply(userText) {
-      const lower = userText.toLowerCase();
-      if (lower.includes('dsa') || lower.includes('algorithms')) {
-        return "Here's a 1-week starter plan for DSA: 1) Arrays & two-pointers — 2 days. 2) Linked Lists & Stacks — 1 day. 3) Recursion & Sorting — 1 day. 4) Trees Basics — 1 day. 5) Practice 5 medium problems daily. Want a 1-month plan?";
-      }
-      if (lower.includes('web') || lower.includes('full stack')) {
-        return "Begin with HTML & CSS (1 week), JS fundamentals (2 weeks), React basics (2 weeks), Node & Express (2 weeks), build 2 mini-projects. Want project ideas?";
-      }
-      return "Nice question! I can help with that — give me details (your current level, time per day).";
-    }
+      <!-- STATS -->
+      <p class="text-xs opacity-80 mt-4">Messages: <span id="msgCount">0</span></p>
+      <p class="text-xs opacity-80">Characters typed: <span id="charCount">0</span></p>
 
-    // show typing indicator for n ms
-    function showTyping(ms = 900) {
-      typingEl.classList.remove('hidden');
-      statusEl.textContent = 'Assistant typing…';
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-      return new Promise(resolve => setTimeout(() => {
-        typingEl.classList.add('hidden');
-        statusEl.textContent = 'Ready';
-        resolve();
-      }, ms));
-    }
+      <div class="mt-4 flex gap-2">
+        <button id="clear" class="flex-1 p-2 bg-red-500 rounded">Clear</button>
+        <button id="download" class="flex-1 p-2 bg-emerald-600 rounded">Download</button>
+      </div>
+    </div>
 
-    // Quick prompt buttons
-    document.querySelectorAll('.quick-btn').forEach(b => {
-      b.addEventListener('click', async () => {
-        const text = b.dataset.prompt;
-        inputMsg.value = text;
-        // optional auto-send:
-        // chatForm.requestSubmit();
-      });
+    <!-- FILE UPLOAD -->
+    <div class="glass p-5 text-white">
+      <h3 class="font-semibold text-lg mb-2">📄 Upload Document (UI only)</h3>
+      <input id="fileInput" type="file" class="text-white/90">
+      <p class="text-xs mt-2 opacity-80">Upload PDF/DOC for AI (backend later)</p>
+    </div>
+
+  </section>
+
+  <!-- ---------------- RIGHT PANEL ---------------- -->
+  <section class="lg:col-span-2 glass p-6 text-white flex flex-col">
+
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold">Chat with EduSetu</h3>
+      <button id="historyBtn" class="px-3 py-1 bg-white/10 rounded">History</button>
+    </div>
+
+    <!-- CHAT MESSAGES -->
+    <div id="messages" class="chat-scroll mb-4 space-y-3">
+      <div class="flex gap-3">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">A</div>
+        <div class="bubble bg-white/10 p-3 rounded-lg">
+          Hello Aman! I'm here to help you with your complete tech journey.
+        </div>
+      </div>
+    </div>
+
+    <!-- TYPING -->
+    <div id="typing" class="hidden text-sm mb-2">
+      <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+      <span class="ml-2">Typing…</span>
+    </div>
+
+    <!-- INPUT -->
+    <form id="chatForm" class="flex gap-2">
+      <textarea id="input" rows="1" placeholder="Ask anything…" class="flex-1 p-3 rounded bg-white text-black"></textarea>
+      <button class="px-4 bg-indigo-600 rounded">Send</button>
+    </form>
+
+  </section>
+
+</main>
+
+
+<!-- ---------------- HISTORY DRAWER ---------------- -->
+<div id="drawer" class="fixed top-0 right-0 h-full w-80 bg-slate-800 text-white p-5 hidden shadow-xl">
+  <h3 class="font-semibold text-lg">Conversation History</h3>
+  <ul id="historyList" class="mt-4 space-y-2 text-sm"></ul>
+</div>
+
+
+
+<script>
+
+/* ---------------- GEMINI API FUNCTION ---------------- */
+async function getGeminiResponse(prompt, model, temperature) {
+  const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { temperature: Number(temperature) }
+  };
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
     });
 
-    // Clear chat
-    document.getElementById('clearBtn').addEventListener('click', () => {
-      messagesEl.innerHTML = '';
-      // add a friendly starter message again
-      appendMessage({ role: 'assistant', text: "Chat cleared. Ask me anything about career or coding!" });
-    });
+    const data = await res.json();
+    return (
+      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "⚠️ No response from Gemini model."
+    );
 
-    // Download (download content as txt)
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      let content = '';
-      document.querySelectorAll('#messages .bubble').forEach(el => {
-        content += el.innerText + "\n\n";
-      });
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'chat.txt';
-      a.click();
-      URL.revokeObjectURL(url);
-    });
+  } catch (err) {
+    return "❌ Error connecting to Gemini API.";
+  }
+}
 
-    // Export and copy functions
-    document.getElementById('exportTxt').addEventListener('click', () => {
-      document.getElementById('downloadBtn').click();
-    });
-    document.getElementById('copyAll').addEventListener('click', () => {
-      let content = '';
-      document.querySelectorAll('#messages .bubble').forEach(el => { content += el.innerText + "\n\n"; });
-      navigator.clipboard.writeText(content).then(()=> alert('Chat copied to clipboard.'));
-    });
+/* ---------------- VARIABLES ------------------- */
+const messagesEL = document.getElementById("messages");
+const input = document.getElementById("input");
+const msgCount = document.getElementById("msgCount");
+const charCount = document.getElementById("charCount");
+const drawer = document.getElementById("drawer");
 
-    // Initial assistant greeting
-    // (if the page loads with no messages)
-    if (messagesEl.children.length === 0) {
-      appendMessage({ role: 'assistant', text: "Hello! I'm EduSetu Assistant. Ask me about learning plans, interview prep, projects, or anything career/coding related." });
-    }
+/* QUICK PROMPTS */
+document.querySelectorAll(".quick").forEach(btn=>{
+  btn.onclick = ()=> input.value = btn.dataset.p;
+});
 
-    // Handle chat submit
-    chatForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const text = inputMsg.value.trim();
-      if (!text) return;
-      appendMessage({ role: 'user', text });
-      inputMsg.value = '';
-      // show typing
-      await showTyping(800);
+/* ADD MESSAGE BUBBLE */
+function addMsg(role,text){
+  const wrap=document.createElement("div");
+  wrap.className="flex gap-3 "+(role==="user"?"justify-end":"");
 
-      // === REAL INTEGRATION (recommended)
-      // Uncomment and adapt to call your backend endpoint that proxies to OpenAI.
-      //
-      // Example (call your backend):
-      //
-      // try {
-      //   const res = await fetch('/api/ai', {
-      //     method: 'POST',
-      //     headers: { 'Content-Type': 'application/json' },
-      //     body: JSON.stringify({
-      //       model: modelSelect.value,
-      //       temperature: parseFloat(tempSlider.value),
-      //       message: text
-      //     })
-      //   });
-      //   const data = await res.json();
-      //   // expected: { reply: "assistant reply text" }
-      //   appendMessage({ role: 'assistant', text: data.reply || 'No reply' });
-      // } catch (err) {
-      //   appendMessage({ role: 'assistant', text: 'Error: Could not reach server.' });
-      // }
-      //
-      // IMPORTANT: Do NOT call OpenAI directly from client JS (exposes API key).
-      // Always proxy via server.
+  const avatar=document.createElement("div");
+  avatar.className="w-10 h-10 rounded-full flex items-center justify-center "+(role==="user"?"bg-indigo-500":"bg-white/20");
+  avatar.textContent=role==="user"?"U":"A";
 
-      // === FALLBACK: Simulated reply (frontend-only)
-      const reply = simulatedReply(text);
-      appendMessage({ role: 'assistant', text: reply });
-    });
+  const bubble=document.createElement("div");
+  bubble.className="bubble p-3 rounded-lg "+(role==="user"?"bg-indigo-600":"bg-white/10");
+  bubble.textContent=text;
 
-    // Accessibility: submit on Enter (Shift+Enter for newline)
-    inputMsg.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        chatForm.requestSubmit();
-      }
-    });
+  if(role==="user"){wrap.appendChild(bubble);wrap.appendChild(avatar);}
+  else{wrap.appendChild(avatar);wrap.appendChild(bubble);}
 
-  </script>
+  messagesEL.appendChild(wrap);
+  messagesEL.scrollTop=messagesEL.scrollHeight;
+
+  updateStats(text);
+  saveLocal();
+}
+
+/* STATS */
+let msgCounter=0, charCounter=0;
+function updateStats(txt){
+  msgCounter++; msgCount.textContent=msgCounter;
+  charCounter+=txt.length; charCount.textContent=charCounter;
+}
+
+/* LOCAL STORAGE */
+function saveLocal(){ localStorage.setItem("edusetuChat", messagesEL.innerHTML); }
+function loadLocal(){
+  const data = localStorage.getItem("edusetuChat");
+  if(data) messagesEL.innerHTML=data;
+}
+loadLocal();
+
+/* TYPING ANIMATION */
+function showTyping(){
+  return new Promise(res=>{
+    document.getElementById("typing").classList.remove("hidden");
+    setTimeout(()=>{
+      document.getElementById("typing").classList.add("hidden");
+      res();
+    },600);
+  });
+}
+
+/* -------------- HANDLE SEND MESSAGE --------------- */
+document.getElementById("chatForm").addEventListener("submit", async(e)=>{
+  e.preventDefault();
+  const text=input.value.trim();
+  if(!text) return;
+
+  addMsg("user",text);
+  input.value="";
+
+  await showTyping();
+
+  const model = document.getElementById("model").value;
+  const temp = document.getElementById("temp").value;
+
+  const reply = await getGeminiResponse(text, model, temp);
+
+  addMsg("assistant", reply);
+});
+
+/* CLEAR */
+document.getElementById("clear").onclick=()=>{
+  messagesEL.innerHTML="";
+  localStorage.removeItem("edusetuChat");
+};
+
+/* DOWNLOAD CHAT */
+document.getElementById("download").onclick=()=>{
+  let txt="";
+  document.querySelectorAll(".bubble").forEach(b=>txt+=b.innerText+"\n\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([txt],{type:"text/plain"}));
+  a.download="edusetu_chat.txt";
+  a.click();
+};
+
+/* HISTORY DRAWER */
+document.getElementById("historyBtn").onclick=()=>{
+  drawer.classList.toggle("hidden");
+  document.getElementById("historyList").innerHTML="";
+  document.querySelectorAll(".bubble").forEach(b=>{
+    const li=document.createElement("li");
+    li.textContent=b.innerText.slice(0,50)+"...";
+    document.getElementById("historyList").appendChild(li);
+  });
+};
+
+</script>
+
 </body>
 </html>

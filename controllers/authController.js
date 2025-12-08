@@ -32,3 +32,7 @@ exports.chatPage = (req, res) => {
 exports.testPage = (req, res) => {
   res.render("test"); 
 };
+exports.profilePage = (req, res) => {
+  res.render("profile"); 
+};
+

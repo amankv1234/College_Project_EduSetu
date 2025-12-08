@@ -1,132 +1,112 @@
 <%- include("partials/navbar") %>
 
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-<style>
-  .glass {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(15px);
+<body class="bg-slate-900 text-white min-h-screen">
+
+<div class="max-w-3xl mx-auto py-10">
+
+  <h1 class="text-3xl font-bold mb-6 mt-8">⚡ Skill Evaluation Test</h1>
+
+  <!-- Form -->
+  <div class="bg-white/10 p-6 rounded-lg space-y-4">
+
+    <input id="topic" 
+           class="w-full p-3 rounded bg-white text-black" 
+           placeholder="Enter topic (e.g. DSA, HTML, Java)" />
+
+    <input id="count" type="number" 
+           class="w-full p-3 rounded bg-white text-black" 
+           placeholder="Number of questions" />
+
+    <button id="generateBtn"
+            class="w-full p-3 bg-indigo-600 rounded">
+      Generate Test with AI
+    </button>
+
+  </div>
+
+  <!-- Output -->
+  <div id="testContainer" class="mt-8 space-y-4"></div>
+
+</div>
+
+<script>
+document.getElementById("generateBtn").onclick = async () => {
+  const topic = document.getElementById("topic").value.trim();
+  const count = document.getElementById("count").value.trim();
+
+  if (!topic || !count) {
+    alert("Please enter topic and number of questions!");
+    return;
   }
-</style>
 
-<body class="bg-gradient-to-br from-purple-600 to-indigo-500 min-h-screen p-6">
+  // Show loading
+  document.getElementById("testContainer").innerHTML =
+    `<p class="text-yellow-300">⏳ Generating test… please wait</p>`;
 
-  <!-- PAGE TITLE -->
-  <h1 class="text-4xl font-bold text-white text-center mb-8">
-    🧠 Skill Evaluation Test
-  </h1>
+  try {
+    const response = await fetch("/api/generate-test", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic, count })
+    });
 
-  <!-- Test Creation Card -->
-  <div class="max-w-2xl mx-auto glass p-6 rounded-xl shadow-lg">
-    
-    <h2 class="text-2xl font-semibold text-white mb-4">
-      Create Your Test
-    </h2>
+    const data = await response.json();
 
-    <div class="space-y-4">
-
-      <!-- Select Topic -->
-      <div>
-        <label class="text-white font-medium">Select Topic</label>
-        <select id="topicSelect"
-          class="w-full p-3 rounded-md mt-1">
-          <option value="">Choose a Topic</option>
-          <option value="HTML">HTML</option>
-          <option value="CSS">CSS</option>
-          <option value="JavaScript">JavaScript</option>
-          <option value="DSA">Data Structures</option>
-          <option value="C++">C++</option>
-          <option value="Python">Python</option>
-        </select>
-      </div>
-
-      <!-- Number of Questions -->
-      <div>
-        <label class="text-white font-medium">Number of Questions</label>
-        <input type="number" id="questionCount" placeholder="Example: 10"
-          class="w-full p-3 mt-1 rounded-md" />
-      </div>
-
-      <!-- Start Test Button -->
-      <button onclick="startTest()"
-        class="w-full bg-yellow-400 hover:bg-yellow-500 text-black py-3 rounded-lg font-semibold text-lg transition">
-        🚀 Start Test
-      </button>
-    </div>
-  </div>
-
-  <!-- ★ QUESTIONS SECTION ★ -->
-  <div id="questionsSection" class="hidden mt-10 max-w-3xl mx-auto glass p-6 rounded-xl">
-    
-    <h2 class="text-3xl text-white font-bold mb-4">📝 Your Test</h2>
-    <div id="questionsContainer" class="space-y-4"></div>
-
-    <button onclick="submitTest()"
-      class="mt-6 w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-semibold text-lg">
-      ✔ Submit Test
-    </button>
-  </div>
-
-  <!-- ★ RESULT SECTION ★ -->
-  <div id="resultSection" class="hidden mt-10 max-w-xl mx-auto glass p-6 rounded-xl text-center">
-    
-    <h2 class="text-3xl text-white font-bold">🎉 Test Completed!</h2>
-
-    <p id="resultScore" class="text-white text-xl mt-3 font-semibold"></p>
-    <p id="resultMotivation" class="text-yellow-200 text-lg mt-2"></p>
-
-    <button onclick="location.reload()"
-      class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
-      🔄 Take Another Test
-    </button>
-  </div>
-
-
-  <!-- JS LOGIC -->
-  <script>
-    function startTest() {
-      const topic = document.getElementById("topicSelect").value;
-      const count = document.getElementById("questionCount").value;
-
-      if (!topic || !count) {
-        alert("Please select a topic and number of questions!");
-        return;
-      }
-
-      document.getElementById("questionsSection").classList.remove("hidden");
-
-      let container = document.getElementById("questionsContainer");
-      container.innerHTML = "";
-
-      for (let i = 1; i <= count; i++) {
-        container.innerHTML += `
-          <div class="bg-white p-4 rounded-lg shadow">
-            <p class="font-semibold mb-2">Question ${i}</p>
-            <input type="text" placeholder="Your answer..."
-              class="w-full p-3 border rounded-md">
-          </div>
-        `;
-      }
+    if (!data.questions) {
+      document.getElementById("testContainer").innerHTML =
+        `<p class="text-red-400">Error: ${data.error || "Something went wrong"}</p>`;
+      return;
     }
 
-    function submitTest() {
-      const score = Math.floor(Math.random() * 100);
+    // Display questions
+    let html = "";
+    data.questions.forEach((q, i) => {
+      html += `
+      <div class="bg-white/10 p-4 rounded">
+        <p class="font-semibold">${i + 1}. ${q.question}</p>
+        <ul class="mt-2 space-y-1">
+          ${q.options.map(op => `
+            <li class="bg-white/20 p-2 rounded">${op}</li>
+          `).join("")}
+        </ul>
+      </div>
+      `;
+    });
 
-      document.getElementById("resultSection").classList.remove("hidden");
-      document.getElementById("resultScore").innerHTML = `Your Score: <b>${score}%</b>`;
+    document.getElementById("testContainer").innerHTML = html;
 
-      let msg = "";
-      if (score < 40) msg = "Don’t worry! Every master was once a beginner.";
-      else if (score < 70) msg = "Good job! Keep learning and improving 📘💡";
-      else msg = "🔥 Excellent! You are on the road to mastery!";
+  } catch (err) {
+    document.getElementById("testContainer").innerHTML =
+      `<p class="text-red-400">Backend error. Check console.</p>`;
+    console.log(err);
+  }
+};
 
-      document.getElementById("resultMotivation").innerHTML = msg;
+document.getElementById("generateBtn").addEventListener("click", function () {
+    const topic = document.getElementById("topic").value;
+    const numQuestions = document.getElementById("count").value;
 
-      window.scrollTo(0, document.body.scrollHeight);
-    }
-  </script>
+    fetch("/api/generate-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic, count })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+        alert("Test Generated! Check console.");
+    })
+    .catch(err => console.error(err));
+});
+
+
+</script>
 
 </body>
 </html>

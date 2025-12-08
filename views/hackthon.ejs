@@ -1,141 +1,276 @@
 <%- include("partials/navbar") %>
-
-  <!-- TailwindCSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
-    .glass {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(15px);
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+    body {
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      background: #f5f7fb;
+    }
+
+    .header {
+      padding: 20px;
+      background: white;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 99;
+    }
+
+    .header h1 {
+      margin: 0;
+      color: #333;
+      text-align: center;
+    }
+
+    /* Search Bar */
+    .search-container {
+      width: 90%;
+      max-width: 900px;
+      margin: 25px auto;
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-container input, select {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+
+    .search-container button {
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: none;
+      background: #4b79ff;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    /* Category Tabs */
+    .tabs {
+      width: 90%;
+      max-width: 900px;
+      margin: 15px auto;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background: #dfe3ff;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    .active-tab {
+      background: #4b79ff;
+      color: white;
+    }
+
+    /* Cards */
+    .cards-container {
+      width: 90%;
+      max-width: 1100px;
+      margin: 25px auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+      color: #4b79ff;
+      margin-top: 0;
+    }
+
+    .skills {
+      margin: 10px 0;
+      font-size: 14px;
+    }
+
+    .skills span {
+      background: #eef1ff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-right: 6px;
+    }
+
+    .btns {
+      margin-top: 12px;
+    }
+
+    .btns button {
+      padding: 10px 12px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .apply {
+      background: #22c55e;
+      color: white;
+    }
+
+    .save {
+      background: #4b79ff;
+      color: white;
+    }
+
+    .details {
+      background: #cccccc;
     }
   </style>
+</head>
 
+<body>
 
-<body class="bg-gradient-to-br from-indigo-600 to-blue-500 min-h-screen">
-
-  <!-- NAVBAR -->
-  <%- include("partials/navbar") %>
-
-  <!-- MAIN PAGE CONTENT -->
-  <div class="p-6 max-w-7xl mx-auto">
-
-    <!-- PAGE TITLE -->
-    <h1 class="text-4xl font-bold text-white text-center mb-8">
-      🌐 Discover Hackathons & Internships
-    </h1>
-
-    <!-- SEARCH + FILTER SECTION -->
-    <div class="glass p-5 mb-8">
-      <h2 class="text-2xl text-white font-bold mb-4">Search Opportunities</h2>
-
-      <div class="grid md:grid-cols-3 gap-4">
-
-        <input type="text"
-          placeholder="🔍 Search keywords (e.g., Web Dev, AI, Blockchain)"
-          class="p-3 rounded-md w-full border" />
-
-        <select class="p-3 rounded-md w-full border">
-          <option>All Categories</option>
-          <option>Hackathons</option>
-          <option>Internships</option>
-          <option>Open Source</option>
-        </select>
-
-        <select class="p-3 rounded-md w-full border">
-          <option>Sort by: Deadline</option>
-          <option>Newest</option>
-          <option>Prize Pool</option>
-        </select>
-
-      </div>
-
-      <button class="mt-4 bg-indigo-700 hover:bg-indigo-900 text-white px-6 py-3 rounded-md font-semibold">
-        🔎 Apply Filters
-      </button>
-    </div>
-
-    <!-- OPPORTUNITIES SECTION -->
-    <h2 class="text-3xl text-white font-bold mb-4">🔥 Latest Opportunities</h2>
-
-    <div class="grid md:grid-cols-2 gap-8">
-
-      <!-- CARD 1 -->
-      <div class="glass p-6">
-        <h3 class="text-2xl text-white font-bold mb-2">Smart India Hackathon 2025</h3>
-        <p class="text-white opacity-90">Government of India — National Level</p>
-
-        <ul class="mt-4 text-white text-sm space-y-1">
-          <li>• Prize: ₹1,00,000</li>
-          <li>• Mode: Offline (Finalists)</li>
-          <li>• Theme: AI, Healthcare, Research</li>
-          <li>• Deadline: Jan 30, 2025</li>
-        </ul>
-
-        <button class="mt-4 w-full bg-green-600 hover:bg-green-800 text-white py-3 rounded-md">
-          View Details
-        </button>
-      </div>
-
-      <!-- CARD 2 -->
-      <div class="glass p-6">
-        <h3 class="text-2xl text-white font-bold mb-2">Google STEP Internship</h3>
-        <p class="text-white opacity-90">Google India — 10-12 week program</p>
-
-        <ul class="mt-4 text-white text-sm space-y-1">
-          <li>• Stipend: ₹80,000/month</li>
-          <li>• Mode: Hybrid</li>
-          <li>• Role: Software Engineer Intern</li>
-          <li>• Deadline: Feb 12, 2025</li>
-        </ul>
-
-        <button class="mt-4 w-full bg-green-600 hover:bg-green-800 text-white py-3 rounded-md">
-          Apply Now
-        </button>
-      </div>
-
-      <!-- CARD 3 -->
-      <div class="glass p-6">
-        <h3 class="text-2xl text-white font-bold mb-2">ETH India Hackathon</h3>
-        <p class="text-white opacity-90">Ethereum Foundation — Web3 Hack</p>
-
-        <ul class="mt-4 text-white text-sm space-y-1">
-          <li>• Prize Pool: $200,000</li>
-          <li>• Mode: In-Person (Bangalore)</li>
-          <li>• Theme: Blockchain, DeFi</li>
-          <li>• Deadline: March 5, 2025</li>
-        </ul>
-
-        <button class="mt-4 w-full bg-green-600 hover:bg-green-800 text-white py-3 rounded-md">
-          Register Now
-        </button>
-      </div>
-
-      <!-- CARD 4 -->
-      <div class="glass p-6">
-        <h3 class="text-2xl text-white font-bold mb-2">Microsoft Future Ready Internship</h3>
-        <p class="text-white opacity-90">Microsoft India — Remote</p>
-
-        <ul class="mt-4 text-white text-sm space-y-1">
-          <li>• Stipend: ₹50,000/month</li>
-          <li>• Mode: Remote</li>
-          <li>• Role: Developer Intern</li>
-          <li>• Deadline: Jan 18, 2025</li>
-        </ul>
-
-        <button class="mt-4 w-full bg-green-600 hover:bg-green-800 text-white py-3 rounded-md">
-          Apply Now
-        </button>
-      </div>
-
-    </div>
-
+  <div class="header">
+    <h1>Explore Opportunities – Hackathons, Internships & Open Source</h1>
   </div>
 
-  <footer class="text-center text-white mt-16 opacity-80 pb-6">
-    © 2025 EduSetu — Opportunities Powered by AI
-  </footer>
+  <!-- Search + Filters -->
+  <div class="search-container">
+    <input id="searchText" type="text" placeholder="Search by title, company, skills...">
+    <select id="filterType">
+      <option value="all">All Types</option>
+      <option value="hackathon">Hackathon</option>
+      <option value="internship">Internship</option>
+      <option value="open-source">Open Source</option>
+    </select>
+    <select id="filterSkill">
+      <option value="all">Skills</option>
+      <option value="Web Dev">Web Dev</option>
+      <option value="JavaScript">JavaScript</option>
+      <option value="React">React</option>
+      <option value="AI/ML">AI/ML</option>
+      <option value="Blockchain">Blockchain</option>
+    </select>
+    <button onclick="applyFilters()">Search</button>
+  </div>
+
+  <!-- Category Tabs -->
+  <div class="tabs">
+    <div class="tab active-tab" onclick="showTab('all')">All</div>
+    <div class="tab" onclick="showTab('hackathon')">Hackathons</div>
+    <div class="tab" onclick="showTab('internship')">Internships</div>
+    <div class="tab" onclick="showTab('open-source')">Open Source</div>
+  </div>
+
+  <!-- Cards -->
+  <div class="cards-container" id="cards"></div>
+
+
+<script>
+  // Dummy opportunity data (Later replace with API)
+  let data = [
+    {
+      title: "Smart India Hackathon 2025",
+      type: "hackathon",
+      skills: ["Web Dev", "JavaScript", "AI/ML"],
+      deadline: "2025-02-21",
+      org: "Gov of India"
+    },
+    {
+      title: "Google Summer Internship",
+      type: "internship",
+      skills: ["C++", "AI/ML", "DSA"],
+      deadline: "2025-01-20",
+      org: "Google"
+    },
+    {
+      title: "MLH Global Hack Week",
+      type: "hackathon",
+      skills: ["React", "Backend", "AI"],
+      deadline: "2025-03-11",
+      org: "MLH"
+    },
+    {
+      title: "Open Source – Mozilla",
+      type: "open-source",
+      skills: ["JavaScript", "React"],
+      deadline: "No Deadline",
+      org: "Mozilla"
+    },
+    {
+      title: "Microsoft Engage Program",
+      type: "internship",
+      skills: ["Python", "AI/ML"],
+      deadline: "2025-04-01",
+      org: "Microsoft"
+    }
+  ];
+
+  let activeType = "all";
+
+  function showTab(type) {
+    activeType = type;
+
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active-tab"));
+    event.target.classList.add("active-tab");
+
+    render();
+  }
+
+  function applyFilters() {
+    render();
+  }
+
+  function render() {
+    let container = document.getElementById("cards");
+    container.innerHTML = "";
+
+    let search = document.getElementById("searchText").value.toLowerCase();
+    let skill = document.getElementById("filterSkill").value;
+    let type = document.getElementById("filterType").value;
+
+    data
+      .filter(item =>
+        (activeType === "all" || item.type === activeType) &&
+        (type === "all" || item.type === type) &&
+        (skill === "all" || item.skills.includes(skill)) &&
+        (item.title.toLowerCase().includes(search) ||
+         item.org.toLowerCase().includes(search))
+      )
+      .forEach(op => {
+        let card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+          <h2>${op.title}</h2>
+          <p><b>Organization:</b> ${op.org}</p>
+          <p><b>Type:</b> ${op.type.toUpperCase()}</p>
+          <p><b>Deadline:</b> ${op.deadline}</p>
+
+          <div class="skills">
+            <b>Skills:</b><br>
+            ${op.skills.map(s => `<span>${s}</span>`).join("")}
+          </div>
+
+          <div class="btns">
+            <button class="apply">Apply</button>
+            <button class="save">Save</button>
+            <button class="details">Details</button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+  }
+
+  render();
+</script>
 
 </body>
 </html>

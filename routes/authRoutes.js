@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { signupUser, loginUser , roadmapPage, hackthonPage,progressPage, chatPage, testPage } = require("../controllers/authController");
+const { signupUser, loginUser , roadmapPage, hackthonPage,progressPage, chatPage, testPage, profilePage } = require("../controllers/authController");
 
 // SIGNUP POST
 router.post("/signup", signupUser);
@@ -12,6 +12,9 @@ router.post("/hackthon", hackthonPage);
 router.post("/progress", progressPage);
 router.post("/chat", chatPage);
 router.post("/test", testPage);
+router.post("/profile", profilePage);
+
+
 
 
 
