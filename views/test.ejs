@@ -4,107 +4,230 @@
 <html lang="en">
 <head>
   <script src="https://cdn.tailwindcss.com"></script>
+  <title>Skill Evaluation Test</title>
 </head>
 
-<body class="bg-slate-900 text-white min-h-screen">
+<body class="bg-gray-100 text-gray-900 min-h-screen">
 
-<div class="max-w-3xl mx-auto py-10">
+<div class="max-w-4xl mx-auto py-10 px-4">
 
-  <h1 class="text-3xl font-bold mb-6 mt-8">⚡ Skill Evaluation Test</h1>
+  <h1 class="text-4xl font-bold mb-6 mt-6 text-center">
+    ⚡ Skill Evaluation Test Generator
+  </h1>
 
-  <!-- Form -->
-  <div class="bg-white/10 p-6 rounded-lg space-y-4">
+  <!-- FORM -->
+  <div class="bg-white shadow-xl p-6 rounded-2xl space-y-4 border">
 
-    <input id="topic" 
-           class="w-full p-3 rounded bg-white text-black" 
-           placeholder="Enter topic (e.g. DSA, HTML, Java)" />
+    <div>
+      <label class="font-semibold">Topic</label>
+      <input id="topic"
+             class="w-full p-3 rounded border mt-1"
+             placeholder="Enter topic (e.g. Java OOPs, HTML Forms, Trees, DBMS Joins)" />
+    </div>
 
-    <input id="count" type="number" 
-           class="w-full p-3 rounded bg-white text-black" 
-           placeholder="Number of questions" />
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <div>
+        <label class="font-semibold">Number of Questions</label>
+        <input id="count" type="number"
+               class="w-full p-3 rounded border mt-1"
+               placeholder="10, 20, 30..." />
+      </div>
+
+      <div>
+        <label class="font-semibold">Difficulty Level</label>
+        <select id="difficulty" class="w-full p-3 rounded border mt-1">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+          <option value="mixed">Mixed</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <div>
+        <label class="font-semibold">Question Type</label>
+        <select id="type" class="w-full p-3 rounded border mt-1">
+          <option value="mcq">MCQ</option>
+          <option value="truefalse">True / False</option>
+          <option value="mixed">Mixed</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="font-semibold">Test Time (minutes)</label>
+        <input id="timer" type="number"
+               class="w-full p-3 rounded border mt-1"
+               placeholder="5, 10, 20..." />
+      </div>
+
+    </div>
+
+    <div>
+      <label class="font-semibold">Additional Notes for better AI output</label>
+      <textarea id="notes"
+        class="w-full p-3 rounded border mt-1"
+        placeholder="Example: Focus on recursion and tree traversal, avoid DP, include real-life examples">
+      </textarea>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <input id="shuffle" type="checkbox" class="h-5 w-5" />
+      <label class="font-semibold">Shuffle questions</label>
+    </div>
 
     <button id="generateBtn"
-            class="w-full p-3 bg-indigo-600 rounded">
+            class="w-full p-3 bg-blue-600 rounded-xl text-white text-lg mt-4 hover:bg-blue-700 transition">
       Generate Test with AI
     </button>
 
   </div>
 
   <!-- Output -->
-  <div id="testContainer" class="mt-8 space-y-4"></div>
+  <div id="testContainer" class="mt-10"></div>
 
 </div>
 
 <script>
+let generatedTest = []; // store AI questions
+
 document.getElementById("generateBtn").onclick = async () => {
+
   const topic = document.getElementById("topic").value.trim();
   const count = document.getElementById("count").value.trim();
+  const difficulty = document.getElementById("difficulty").value;
+  const type = document.getElementById("type").value;
+  const timer = document.getElementById("timer").value.trim();
+  const notes = document.getElementById("notes").value.trim();
+  const shuffle = document.getElementById("shuffle").checked;
 
   if (!topic || !count) {
     alert("Please enter topic and number of questions!");
     return;
   }
 
-  // Show loading
   document.getElementById("testContainer").innerHTML =
-    `<p class="text-yellow-300">⏳ Generating test… please wait</p>`;
+    `<p class="text-blue-600 font-semibold text-lg">⏳ Generating test… please wait...</p>`;
 
   try {
     const response = await fetch("/api/generate-test", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic, count })
+      body: JSON.stringify({ topic, count, difficulty, type, timer, notes, shuffle })
     });
 
     const data = await response.json();
 
     if (!data.questions) {
       document.getElementById("testContainer").innerHTML =
-        `<p class="text-red-400">Error: ${data.error || "Something went wrong"}</p>`;
+        `<p class="text-red-500">Error: ${data.error || "Something went wrong"}</p>`;
       return;
     }
 
-    // Display questions
-    let html = "";
-    data.questions.forEach((q, i) => {
-      html += `
-      <div class="bg-white/10 p-4 rounded">
-        <p class="font-semibold">${i + 1}. ${q.question}</p>
-        <ul class="mt-2 space-y-1">
-          ${q.options.map(op => `
-            <li class="bg-white/20 p-2 rounded">${op}</li>
-          `).join("")}
-        </ul>
-      </div>
-      `;
-    });
+    generatedTest = data.questions;
 
-    document.getElementById("testContainer").innerHTML = html;
-
+    showPreview();
   } catch (err) {
     document.getElementById("testContainer").innerHTML =
-      `<p class="text-red-400">Backend error. Check console.</p>`;
+      `<p class="text-red-500">Backend error. Check console.</p>`;
     console.log(err);
   }
 };
 
-document.getElementById("generateBtn").addEventListener("click", function () {
-    const topic = document.getElementById("topic").value;
-    const numQuestions = document.getElementById("count").value;
 
-    fetch("/api/generate-test", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, count })
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log(data);
-        alert("Test Generated! Check console.");
-    })
-    .catch(err => console.error(err));
-});
+function showPreview() {
+  let html = `
+    <div class="bg-white p-6 shadow-xl rounded-2xl mb-6">
+      <h2 class="text-2xl font-bold">Test Preview</h2>
+      <p class="text-gray-700">Below are your generated questions:</p>
+      <button onclick="startTest()"
+        class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+        Start Test
+      </button>
+    </div>
+  `;
 
+  generatedTest.forEach((q, i) => {
+    html += `
+      <div class="bg-white p-5 shadow rounded-xl mb-4 border">
+        <p class="font-semibold text-lg">${i + 1}. ${q.question}</p>
+        <ul class="mt-2 space-y-1">
+          ${q.options.map(op => `
+            <li class="bg-gray-100 p-2 rounded">${op}</li>
+          `).join("")}
+        </ul>
+      </div>
+    `;
+  });
+
+  document.getElementById("testContainer").innerHTML = html;
+}
+
+
+
+function startTest() {
+  let html = `
+    <div class="bg-white p-6 shadow-xl rounded-2xl mb-6">
+      <h2 class="text-2xl font-bold">Solve the Test</h2>
+      <p class="text-gray-700">Select the correct answers:</p>
+    </div>
+  `;
+
+  generatedTest.forEach((q, i) => {
+    html += `
+      <div class="bg-white p-5 shadow rounded-xl mb-4 border">
+        <p class="font-semibold text-lg">${i + 1}. ${q.question}</p>
+        <ul class="mt-2 space-y-2">
+          ${q.options.map(op => `
+            <label class="flex gap-2 items-center">
+              <input name="q${i}" type="radio" value="${op}" class="h-4 w-4">
+              ${op}
+            </label>
+          `).join("")}
+        </ul>
+      </div>
+    `;
+  });
+
+  html += `
+    <button onclick="submitTest()"
+      class="w-full mt-6 bg-purple-600 text-white py-3 rounded-xl text-lg hover:bg-purple-700">
+      Submit Test
+    </button>
+  `;
+
+  document.getElementById("testContainer").innerHTML = html;
+}
+
+
+
+function submitTest() {
+  let score = 0;
+
+  generatedTest.forEach((q, i) => {
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    if (selected && selected.value === q.answer) score++;
+  });
+
+  let motivation = "Great job! Keep improving! 🚀";
+  if (score < generatedTest.length / 2) motivation = "Don't worry, keep practicing 💪";
+  if (score === generatedTest.length) motivation = "Perfect Score! Outstanding! 🌟";
+
+  document.getElementById("testContainer").innerHTML = `
+    <div class='bg-white p-6 shadow-xl rounded-2xl text-center'>
+      <h2 class='text-3xl font-bold mb-4'>Your Score: ${score}/${generatedTest.length}</h2>
+      <p class='text-xl text-gray-700 mb-4'>${motivation}</p>
+
+      <button onclick="showPreview()"
+        class="bg-blue-600 text-white px-6 py-3 rounded-xl mt-4 hover:bg-blue-700">
+        View Questions Again
+      </button>
+    </div>
+  `;
+}
 
 </script>
 

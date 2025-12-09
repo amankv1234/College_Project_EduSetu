@@ -5,6 +5,8 @@ const aiRoutes = require ("../routes/aiRoutes.js");
 const authRoutes = require("../routes/authRoutes");
 const mainRoutes = require("../routes/mainRoutes");
 const codeRoutes = require("../routes/codeRoutes");
+const successRoutes = require("../routes/successRoutes");
+const opportunitiesRoutes = require("../routes/opportunitiesRoutes");
 const app = express();
 app.use(express.json());
 // MongoDB Connection
@@ -28,14 +30,19 @@ app.set("views", path.join(__dirname, "..", "views"));
 app.get("/livecode", (req, res) => {
     res.render("livecode");
 });
-app.get("/aiquiz", (req, res) => {
-    res.render("aiquiz");
+app.get("/success", (req, res) => {
+    res.render("success");
+});
+app.get("/opportunities", (req, res) => {
+    res.render("opportunities");
 });
 
+app.use("/", opportunitiesRoutes);
 app.use("/", mainRoutes);
 app.use("/", authRoutes);
 app.use("/api", aiRoutes);
 app.use("/api", codeRoutes);
+app.use("/api", successRoutes);
 // Server
 app.listen(8000, () => {
   console.log("Server running on http://localhost:8000");

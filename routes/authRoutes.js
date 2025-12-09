@@ -9,7 +9,6 @@ router.post("/signup", signupUser);
 router.post("/login", loginUser);
 router.post("/roadmap", roadmapPage);
 router.post("/hackthon", hackthonPage);
-router.post("/progress", progressPage);
 router.post("/chat", chatPage);
 router.post("/test", testPage);
 router.post("/profile", profilePage);

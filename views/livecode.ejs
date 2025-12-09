@@ -1,71 +1,234 @@
 <%- include("partials/navbar") %>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+
 <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #f4f4f4;
-        }
-        #editor {
-            width: 100%;
-            height: 300px;
-            padding: 10px;
-            background: #1e1e1e;
-            color: #fff;
-            font-family: monospace;
-            font-size: 16px;
-            border-radius: 10px;
-        }
-        #output {
-            width: 100%;
-            height: 200px;
-            background: #000;
-            color: #0f0;
-            padding: 10px;
-            margin-top: 20px;
-            border-radius: 10px;
-            overflow-y: auto;
-            font-family: monospace;
-        }
-        select, button {
-            padding: 10px;
-            margin-top: 15px;
-            font-size: 16px;
-        }
-    </style>
-</head>
-<body>
+  :root { --bg:#0d1117; --card:#0f1720; --muted:#9aa4b2; --accent:#06f; }
+  body { background: var(--bg); color: #e6eef8; font-family: Inter, Arial; padding: 20px; }
+  .wrap { max-width:1200px; margin: auto; margin-top: 50px; }
+  h2 { text-align:center; margin-bottom:12px; }
+  .grid { display:grid; grid-template-columns: 1fr 380px; gap:20px; align-items:start; }
+  @media(max-width:980px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: linear-gradient(180deg,#071018, #0f1720); padding:16px; border-radius:12px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+  select, input, button, textarea { border-radius:8px; border:none; padding:8px 10px; font-size:14px; }
+  .btn { background:#0ea5ff; color:#05202b; font-weight:600; padding:8px 12px; cursor:pointer; }
+  .btn.secondary { background:#10b981; color:#022; }
+  .btn.warn { background:#f97316; color:#122; }
+  .files { display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+  .file-pill { background:#081826; padding:6px 10px; border-radius:999px; cursor:pointer; }
+  .file-pill.active { outline: 2px solid rgba(6,165,255,0.18); }
+  #editor, .CodeMirror { height: 420px; border-radius:8px; }
+  .right-col { display:flex; flex-direction:column; gap:12px; }
+  .panel { padding:10px; border-radius:8px; background:#071826; }
+  .panel h4 { margin:0 0 8px 0; color:var(--muted); font-size:13px }
+  .testcases { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow:auto; }
+  .test-row { display:flex; gap:8px; }
+  textarea.stdin { min-height:60px; background:#001219; color:#bde; }
+  pre#output { min-height:140px; background:#000; color:#7fffd4; padding:12px; border-radius:6px; overflow:auto; }
+  .small { font-size:13px; color:var(--muted); }
+</style>
 
-<h2>Live Coding Environment</h2>
+<div class="wrap">
+  <h2>🔥 Live Coding — Playground (Gemini AI suggestions)</h2>
 
-<select id="language">
-    <option value="52">C++</option>
-    <option value="62">Java</option>
-    <option value="63">JavaScript</option>
-    <option value="71">Python</option>
-</select>
+  <div class="grid">
+    <!-- LEFT: Editor -->
+    <div>
+      <div class="card">
+        <div class="toolbar">
+          <select id="language">
+            <option value="71" selected>Python (3.x)</option>
+            <option value="63">JavaScript (node)</option>
+            <option value="54">C++ (g++)</option>
+            <option value="62">Java (openjdk)</option>
+          </select>
 
-<textarea id="editor">print("Hello Aman")</textarea>
+          <button class="btn" id="addFileBtn">+ Add File</button>
+          <button class="btn secondary" id="downloadBtn">⤓ Download</button>
+          <button class="btn warn" id="aiSuggestBtn">💡 AI Suggest</button>
+          <div style="flex:1"></div>
+          <button class="btn" id="runBtn">▶ Run</button>
+          <button class="btn secondary" id="runTcBtn">▶ Run Testcases</button>
+        </div>
 
-<br>
-<button onclick="runCode()">Run Code</button>
+        <div class="files small" id="filesBar">
+          <!-- file pills go here -->
+        </div>
 
-<pre id="output">Output will appear here...</pre>
+        <textarea id="editor">print("Hello Aman")</textarea>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <div class="panel">
+          <h4>StdIn (single input for Run)</h4>
+          <textarea id="stdin" class="stdin" placeholder="Enter input for program (e.g. lines separated)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Testcases + Output -->
+    <div class="right-col">
+      <div class="card panel">
+        <h4>Testcases (multiple)</h4>
+        <div class="testcases" id="testcases">
+          <!-- dynamic rows -->
+        </div>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <button class="btn" id="addTc">+ Add Testcase</button>
+          <button class="btn secondary" id="clearTc">Clear</button>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <h4>Output</h4>
+        <pre id="output">Output will appear here...</pre>
+        <div class="small" style="margin-top:8px;">Status: <span id="status">idle</span></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-async function runCode() {
-    const code = document.getElementById("editor").value;
-    const lang = document.getElementById("language").value;
+  // Simple file manager (in-memory)
+  let files = [{ name: "main", code: "print('Hello Aman')" }];
+  let activeIndex = 0;
 
-    const res = await fetch("/api/run-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, lang })
+  function renderFiles() {
+    const bar = document.getElementById("filesBar");
+    bar.innerHTML = "";
+    files.forEach((f, i) => {
+      const pill = document.createElement("div");
+      pill.className = 'file-pill' + (i===activeIndex? ' active':'');
+      pill.innerText = f.name;
+      pill.onclick = () => {
+        saveActiveFile();
+        activeIndex = i;
+        editor.setValue(files[i].code);
+        renderFiles();
+      };
+      bar.appendChild(pill);
     });
+  }
 
+  // CodeMirror editor
+  const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+    mode: "python",
+    theme: "dracula",
+    lineNumbers: true,
+    autoCloseBrackets: true,
+  });
+  editor.setSize("100%", "420px");
+
+  // language mode change
+  document.getElementById("language").addEventListener("change", (e) => {
+    const val = e.target.value;
+    let mode = "python";
+    if(val==63) mode='javascript';
+    if(val==54) mode='text/x-c++src';
+    if(val==62) mode='text/x-java';
+    editor.setOption("mode", mode);
+  });
+
+  function saveActiveFile() {
+    files[activeIndex].code = editor.getValue();
+  }
+
+  document.getElementById("addFileBtn").addEventListener("click", () => {
+    saveActiveFile();
+    const name = prompt("File name (e.g. helper.py, utils.js):", "file"+(files.length+1));
+    if(!name) return;
+    files.push({ name, code: "// new file" });
+    activeIndex = files.length-1;
+    editor.setValue(files[activeIndex].code);
+    renderFiles();
+  });
+
+  document.getElementById("downloadBtn").addEventListener("click", () => {
+    saveActiveFile();
+    const blob = new Blob(files.map(f => `// file: ${f.name}\n\n${f.code}\n\n`), { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'project.txt'; a.click(); URL.revokeObjectURL(url);
+  });
+
+  // Testcases
+  function addTestcase(inVal='', outVal='') {
+    const tcBox = document.createElement('div'); tcBox.className='test-row';
+    const inTa = document.createElement('textarea'); inTa.placeholder='input'; inTa.value=inVal; inTa.style.flex='1';
+    const outTa = document.createElement('textarea'); outTa.placeholder='expected output'; outTa.value=outVal; outTa.style.width='140px';
+    const rem = document.createElement('button'); rem.innerText='✖'; rem.onclick=()=>{ tcBox.remove(); };
+    tcBox.appendChild(inTa); tcBox.appendChild(outTa); tcBox.appendChild(rem);
+    document.getElementById('testcases').appendChild(tcBox);
+  }
+  document.getElementById('addTc').addEventListener('click', ()=>addTestcase());
+  document.getElementById('clearTc').addEventListener('click', ()=>{ document.getElementById('testcases').innerHTML=''; });
+
+  // initial render
+  renderFiles(); addTestcase("5\n1 2 3 4 5","15");
+
+  // runner helpers
+  async function runSingle(runType='run') {
+    saveActiveFile();
+    const payload = {
+      language: document.getElementById('language').value,
+      files: files,
+      stdin: document.getElementById('stdin').value || '',
+      runType
+    };
+    setStatus('running...');
+    output('Running...');
+    const res = await fetch('/api/run-code', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
     const data = await res.json();
-    document.getElementById("output").innerText = data.output;
-}
-</script>
+    setStatus(data.status || 'done');
+    output(data.output || JSON.stringify(data,null,2));
+  }
 
-</body>
-</html>
+  document.getElementById('runBtn').addEventListener('click', ()=>runSingle('run'));
+
+
+  // Run testcases button
+  document.getElementById('runTcBtn').addEventListener('click', async ()=>{
+    saveActiveFile();
+    const tcEls = Array.from(document.querySelectorAll('#testcases .test-row'));
+    const tcs = tcEls.map(r => {
+      const ta = r.querySelectorAll('textarea');
+      return { input: ta[0].value||'', expected: ta[1].value||'' };
+    });
+    setStatus('running testcases...');
+    output('Running testcases...');
+    const payload = { language: document.getElementById('language').value, files, testcases: tcs };
+    const res = await fetch('/api/run-testcases', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const data = await res.json();
+    setStatus('testcases done');
+    output(JSON.stringify(data, null, 2));
+  });
+
+  // AI Suggest
+  document.getElementById('aiSuggestBtn').addEventListener('click', async ()=>{
+    saveActiveFile();
+    setStatus('asking AI...');
+    output('Asking AI for suggestions...');
+    const payload = { language: document.getElementById('language').value, files };
+    const res = await fetch('/api/ai-suggest', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const data = await res.json();
+    setStatus('ai done');
+    if(data.suggestions) {
+      output(data.suggestions);
+      if(confirm('Apply suggested change to active file?')) {
+        // simple: if AI includes replacement code for active file, try to apply (AI format must be agreed)
+        // here we simply show suggestion; manual apply recommended
+      }
+    } else {
+      output('No suggestions: ' + (data.error||'unknown'));
+    }
+  });
+
+  // UI helpers
+  function output(txt) { document.getElementById('output').innerText = txt; }
+  function setStatus(s) { document.getElementById('status').innerText = s; }
+</script>

@@ -1,191 +1,543 @@
 <%- include("partials/navbar") %>
-
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Roadmaps — EduSetu</title>
 
   <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background: #f4f7fc;
-      margin: 0;
-      padding: 0;
+    :root{
+      --bg1: #0f1724;
+      --bg2: #042b2b; /* teal-ish */
+      --card:#071827;
+      --muted:#9aa4b2;
+      --accent:#4bd1c6; /* teal accent */
+      --accent2:#6b5cff; /* violet accent */
     }
+    /* Page */
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, var(--bg2) 0%, var(--bg1) 60%);
+      color:#e6eef8;
+      padding:28px 14px;
+    }
+    .wrap{ max-width:1200px; margin:auto; margin-top: 50px; }
+    h1{ text-align:center; margin: 6px 0 12px; font-size:28px; color:#eaf1ff; }
+    .sub { text-align:center; color:var(--muted); margin-bottom:18px; }
 
-    .container {
-      width: 90%;
-      max-width: 1100px;
-      margin: auto;
-      margin-top: 20px;
-      padding-top: 40px;
-    }
+    /* Grid layout */
+    .grid { display:grid; grid-template-columns: 420px 1fr; gap:18px; align-items:start; }
+    @media(max-width:980px){ .grid{ grid-template-columns: 1fr; } }
 
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 30px;
+    /* Left panel (form) */
+    .panel { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:16px; border-radius:12px; box-shadow: 0 10px 30px rgba(2,6,23,0.6); }
+    .panel h3 { margin:0 0 12px; color:#dbe8ff; }
+    .row { display:flex; gap:8px; }
+    .field { margin-bottom:10px; display:flex; flex-direction:column; }
+    label{ font-size:13px; color:var(--muted); margin-bottom:6px; }
+    input[type="text"], input[type="number"], select, textarea {
+      background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); padding:10px 12px; border-radius:8px; color:#eaf1ff;
+      outline:none; font-size:14px;
     }
+    textarea{ min-height:80px; resize:vertical; }
 
-    /* Form */
-    .form-box {
-      background: #ffffff;
-      padding: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      border-radius: 10px;
-      margin-bottom: 40px;
-    }
+    .tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+    .tag { background: rgba(75,209,198,0.08); padding:6px 8px; border-radius:999px; font-size:13px; color: #cfe1ff; display:flex; gap:8px; align-items:center; }
+    .tag button{ background:none; border:none; color:#88b0ff; cursor:pointer; }
 
-    .form-box input {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 15px;
-    }
+    .btn { padding:10px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+    .btn.primary{ background: linear-gradient(90deg,var(--accent), var(--accent2)); color:#04102a; }
+    .btn.ghost{ background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--muted); }
+    .btn.block{ width:100%; display:block; text-align:center; }
 
-    .form-box button {
-      margin-top: 15px;
-      background: #4b79ff;
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-      width: 100%;
-    }
+    /* Right: list of roadmaps */
+    .list { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px; }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:14px; box-shadow:0 8px 28px rgba(2,6,23,0.6); border:1px solid rgba(255,255,255,0.02); }
+    .card h4{ margin:0 0 8px; color:#eaf1ff; display:flex; justify-content:space-between; align-items:center; }
+    .meta{ font-size:13px; color:var(--muted); margin-bottom:8px; }
+    .tags-inline{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+    .step { padding:8px 10px; border-radius:8px; background: rgba(255,255,255,0.02); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
+    .step.done { background: rgba(45,200,120,0.08); text-decoration:line-through; color:#bfeacc; }
 
-    /* Roadmap Cards */
-    .roadmap-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 25px;
-    }
+    .card .actions{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
 
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
+    .small { font-size:13px; color:var(--muted); }
 
-    .card h3 {
-      color: #4b79ff;
-    }
+    /* progress bar */
+    .progress-wrap{ background: rgba(255,255,255,0.03); height:10px; border-radius:999px; overflow:hidden; margin-top:8px; }
+    .progress-fill{ height:100%; background: linear-gradient(90deg,var(--accent),var(--accent2)); width:0%; transition:width 300ms ease; }
 
-    .step {
-      background: #f1f3ff;
-      padding: 10px;
-      border-radius: 8px;
-      margin: 10px 0;
-    }
+    /* modal */
+    .modal { position:fixed; inset:0; background:rgba(2,6,23,0.6); display:flex; align-items:center; justify-content:center; z-index:60; }
+    .modal .box { width:95%; max-width:900px; background:#071225; padding:18px; border-radius:12px; color:#eaf1ff; max-height:80vh; overflow:auto; }
+    .kbd { background:#0b1420; padding:6px 8px; border-radius:6px; font-family:monospace; font-size:13px; }
 
-    .completed {
-      background: #cfffd2;
-      text-decoration: line-through;
-      color: #1f7a1f;
-    }
-
-    .complete-btn {
-      background: #22c55e;
-      color: white;
-      padding: 7px 10px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 6px;
-    }
   </style>
 </head>
-
 <body>
-  <div class="container">
+  <div class="wrap">
+    <h1>Smart Roadmaps — AI-ready Creator</h1>
+    <div class="sub">When AI refines a roadmap, steps will become checkable — earn points as you complete them.</div>
 
-    <h1>Your Roadmaps</h1>
+    <div class="grid">
+      <!-- LEFT: Form -->
+      <div class="panel">
+        <h3>Create / Auto-generate Roadmap</h3>
 
-    <!-- Create Roadmap -->
-    <div class="form-box">
-      <h2>Create New Roadmap</h2>
-      <input id="goal" type="text" placeholder="Enter your goal (e.g., Web Developer)">
-      <input id="skills" type="text" placeholder="Skills (comma separated)">
-      <button onclick="createRoadmap()">Add Roadmap</button>
+        <div class="field">
+          <label>Goal title</label>
+          <input id="r_goal" type="text" placeholder="e.g., Web Developer, Data Scientist">
+        </div>
+
+        <div class="row">
+          <div class="field" style="flex:1;">
+            <label>Year / Education level</label>
+            <select id="r_year">
+              <option value="12">12th / High School</option>
+              <option value="1">1st Year Undergraduate</option>
+              <option value="2">2nd Year Undergraduate</option>
+              <option value="3">3rd Year Undergraduate</option>
+              <option value="4">4th Year Undergraduate</option>
+              <option value="grad">Graduate / Working</option>
+            </select>
+          </div>
+
+          <div class="field" style="flex:1;">
+            <label>Branch / Major</label>
+            <input id="r_branch" type="text" placeholder="e.g., CSE, IT, ECE, Non-CS">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Domain / Subdomain</label>
+          <input id="r_domain" type="text" placeholder="e.g., Web Dev, Machine Learning, Competitive Programming">
+        </div>
+
+        <div class="field">
+          <label>Interests (comma separated)</label>
+          <input id="r_interests" type="text" placeholder="e.g., Frontend, Backend, ML, Algorithms">
+          <div class="small">Tip: add multiple interests to get a hybrid roadmap.</div>
+        </div>
+
+        <div class="row">
+          <div class="field" style="flex:1;">
+            <label>Weekly study hours</label>
+            <input id="r_weekly_hours" type="number" min="1" value="10">
+          </div>
+          <div class="field" style="flex:1;">
+            <label>Target completion (weeks)</label>
+            <input id="r_target_weeks" type="number" min="1" value="12">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Skill list (comma separated, prioritized)</label>
+          <input id="r_skills" type="text" placeholder="e.g., HTML, CSS, JS, React">
+        </div>
+
+        <div class="field">
+          <label>Priority skills (comma - highest priority first)</label>
+          <input id="r_priority" type="text" placeholder="e.g., React, DSA">
+        </div>
+
+        <div class="field">
+          <label>Skill levels (json or CSV) — optional</label>
+          <input id="r_skill_levels" type="text" placeholder='e.g., {"HTML":"beginner","JS":"intermediate"} or "HTML:beginner,JS:intermediate"'>
+          <div class="small">This helps AI adjust recommended starting points.</div>
+        </div>
+
+        <div class="field">
+          <label>Preferred learning style</label>
+          <select id="r_style">
+            <option value="projects">Project-based</option>
+            <option value="theory">Theory-first</option>
+            <option value="mixed">Mixed</option>
+            <option value="competitive">Competition-focused</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Constraints / Notes</label>
+          <textarea id="r_constraints" placeholder="e.g., no paid courses, limited internet, only mobile"></textarea>
+        </div>
+
+        <div class="row" style="margin-top:6px;">
+          <button class="btn primary" onclick="createRoadmap()">Create & Auto-generate Steps</button>
+          <button class="btn ghost" onclick="clearForm()">Clear</button>
+        </div>
+
+        <div style="margin-top:12px;" class="small">
+          After creating, click "AI Refine" on a roadmap to send structured payload to Gemini. AI output will convert into checkable steps with points.
+        </div>
+      </div>
+
+      <!-- RIGHT: Roadmaps List -->
+      <div>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input id="search" type="text" placeholder="Search roadmaps..." style="flex:1; padding:10px; border-radius:8px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); color:#eaf1ff;">
+          <button class="btn ghost" onclick="exportAll()">Export All (JSON)</button>
+        </div>
+
+        <div id="roadmapList" class="list"></div>
+      </div>
     </div>
-
-    <!-- Saved Roadmaps -->
-    <div class="roadmap-container" id="roadmaps"></div>
   </div>
 
+  <!-- Modal for AI payload / preview -->
+  <div id="modal" class="modal" style="display:none;">
+    <div class="box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h3 style="margin:0">AI Payload / Roadmap Preview</h3>
+        <div>
+          <button class="btn ghost" onclick="copyPayload()">Copy</button>
+          <button class="btn primary" onclick="sendToAI()">AI Refine</button>
+          <button class="btn" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+      <pre id="modalContent" style="white-space:pre-wrap; font-family:monospace; background:#02101a; padding:12px; border-radius:8px; max-height:60vh; overflow:auto;"></pre>
+    </div>
+  </div>
 
-<script>
-  let roadmaps = JSON.parse(localStorage.getItem("roadmaps") || "[]");
+  <script>
+    // Storage
+    let roadmaps = JSON.parse(localStorage.getItem('smart_roadmaps_v2') || '[]');
 
-  function save() {
-    localStorage.setItem("roadmaps", JSON.stringify(roadmaps));
-    display();
-  }
+    // Helpers
+    function saveAll(){ localStorage.setItem('smart_roadmaps_v2', JSON.stringify(roadmaps)); renderList(); }
 
-  function createRoadmap() {
-    let goal = document.getElementById("goal").value;
-    let skills = document.getElementById("skills").value.split(",").map(s => s.trim());
+    function clearForm(){
+      document.getElementById('r_goal').value='';
+      document.getElementById('r_year').value='1';
+      document.getElementById('r_branch').value='';
+      document.getElementById('r_domain').value='';
+      document.getElementById('r_interests').value='';
+      document.getElementById('r_weekly_hours').value='10';
+      document.getElementById('r_target_weeks').value='12';
+      document.getElementById('r_skills').value='';
+      document.getElementById('r_priority').value='';
+      document.getElementById('r_skill_levels').value='';
+      document.getElementById('r_style').value='projects';
+      document.getElementById('r_constraints').value='';
+    }
 
-    if (!goal) return alert("Enter a goal!");
+    // Simple algorithm to auto-generate steps from skills & time
+    function generateSteps(skillsArr, weeklyHours, targetWeeks, style, priorityArr){
+      const totalWeeks = Math.max(1, parseInt(targetWeeks||8));
+      const slots = totalWeeks;
+      const ordered = [...new Set([...priorityArr.filter(Boolean), ...skillsArr.filter(Boolean)])];
+      const steps = [];
+      const perSkill = Math.max(1, Math.ceil(slots / Math.max(1, ordered.length)));
+      let weekCounter = 1;
+      for(let i=0;i<ordered.length;i++){
+        const sk = ordered[i];
+        const weeksForSkill = Math.min(perSkill, slots - weekCounter + 1);
+        const duration = weeksForSkill + ' week' + (weeksForSkill>1?'s':'');
+        steps.push({ title: `Learn ${sk}`, desc: `Focus on ${sk} — theory + small projects. Weekly hours: ${weeklyHours}`, duration, done:false, startWeek: weekCounter, endWeek: weekCounter + weeksForSkill - 1, points: 10 });
+        weekCounter += weeksForSkill;
+        if(weekCounter>slots) break;
+      }
+      if(weekCounter <= slots){
+        steps.push({ title: 'Capstone Project & Revision', desc: 'Build a complete project that uses learned skills and revise weak areas.', duration: (slots-weekCounter+1)+' week(s)', done:false, startWeek: weekCounter, endWeek: slots, points: 20 });
+      }
+      if(style === 'competitive'){
+        steps.unshift({ title:'DSA & Problem Solving', desc: 'Daily practice on problem solving platforms.', duration:'Ongoing', done:false, points: 15 });
+      }
+      return steps;
+    }
 
-    let newRoadmap = {
-      id: Date.now(),
-      goal,
-      skills,
-      steps: [
-        { title: "Learn Basics", desc: "Start with fundamentals", duration: "1 week", done: false },
-        { title: "Practice Exercises", desc: "Solve coding exercises", duration: "10 days", done: false },
-        { title: "Build Projects", desc: "Create mini projects", duration: "2 weeks", done: false }
-      ]
-    };
+    function createRoadmap(){
+      const goal = document.getElementById('r_goal').value.trim();
+      if(!goal) return alert('Please enter a goal title');
 
-    roadmaps.push(newRoadmap);
-    save();
+      const year = document.getElementById('r_year').value;
+      const branch = document.getElementById('r_branch').value.trim();
+      const domain = document.getElementById('r_domain').value.trim();
+      const interests = document.getElementById('r_interests').value.split(',').map(s=>s.trim()).filter(Boolean);
+      const weeklyHours = Number(document.getElementById('r_weekly_hours').value) || 10;
+      const targetWeeks = Number(document.getElementById('r_target_weeks').value) || 12;
+      const skills = document.getElementById('r_skills').value.split(',').map(s=>s.trim()).filter(Boolean);
+      const priority = document.getElementById('r_priority').value.split(',').map(s=>s.trim()).filter(Boolean);
+      const skillLevelsRaw = document.getElementById('r_skill_levels').value.trim();
+      let skillLevels = {};
+      if(skillLevelsRaw){
+        try{
+          if(skillLevelsRaw.startsWith('{')) skillLevels = JSON.parse(skillLevelsRaw);
+          else {
+            skillLevelsRaw.split(',').map(pair => {
+              const [k,v]=pair.split(':').map(x=>x && x.trim());
+              if(k) skillLevels[k]=v||'unknown';
+            });
+          }
+        } catch(e){
+          console.warn('skill levels parse error', e);
+        }
+      }
+      const style = document.getElementById('r_style').value;
+      const constraints = document.getElementById('r_constraints').value.trim();
 
-    document.getElementById("goal").value = "";
-    document.getElementById("skills").value = "";
-  }
+      // auto generate steps
+      const steps = generateSteps(skills, weeklyHours, targetWeeks, style, priority);
 
+      const roadmap = {
+        id: Date.now(),
+        goal, year, branch, domain, interests, weeklyHours, targetWeeks, skills, priority, skillLevels, style, constraints,
+        steps,
+        pointsEarned: 0,
+        createdAt: new Date().toISOString()
+      };
 
-  function markStep(roadmapId, index) {
-    let roadmap = roadmaps.find(r => r.id === roadmapId);
-    roadmap.steps[index].done = true;
-    save();
-  }
+      roadmaps.unshift(roadmap);
+      saveAll();
+      clearForm();
+    }
 
-
-  function display() {
-    let box = document.getElementById("roadmaps");
-    box.innerHTML = "";
-
-    roadmaps.forEach(roadmap => {
-      let card = document.createElement("div");
-      card.className = "card";
-
-      card.innerHTML += `<h3>${roadmap.goal}</h3>`;
-      card.innerHTML += `<p><strong>Skills:</strong> ${roadmap.skills.join(", ") || "None"}</p>`;
-      card.innerHTML += `<h4>Steps:</h4>`;
-
-      roadmap.steps.forEach((step, i) => {
-        card.innerHTML += `
-          <div class="step ${step.done ? 'completed' : ''}">
-            <strong>${step.title}</strong>
-            <p>${step.desc}</p>
-            <p>⏳ ${step.duration}</p>
-
-            ${!step.done ? 
-              `<button class="complete-btn" onclick="markStep(${roadmap.id}, ${i})">Mark Completed</button>`
-            : `<strong>✔ Completed</strong>`}
-          </div>
-        `;
+    function renderList(){
+      const list = document.getElementById('roadmapList');
+      list.innerHTML = '';
+      const q = (document.getElementById('search').value || '').toLowerCase();
+      const shown = roadmaps.filter(r => {
+        if(!q) return true;
+        return (r.goal + ' ' + (r.skills||[]).join(' ') + ' ' + (r.domain||'') + ' ' + (r.interests||[]).join(' ')).toLowerCase().includes(q);
       });
+      if(shown.length===0){
+        list.innerHTML = `<div class="card"><div class="small">No roadmaps. Create one from the left panel.</div></div>`;
+        return;
+      }
+      shown.forEach(r=>{
+        const card = document.createElement('div'); card.className='card';
+        const h = document.createElement('h4'); h.innerHTML = `<span>${r.goal}</span><span class="small">${r.domain||''}</span>`;
+        card.appendChild(h);
 
-      box.appendChild(card);
-    });
-  }
+        const meta = document.createElement('div'); meta.className='meta small';
+        meta.innerHTML = `Year: ${r.year} · Branch: ${r.branch||'—'} · Weekly: ${r.weeklyHours}h · Target: ${r.targetWeeks}w`;
+        card.appendChild(meta);
 
-  display();
-</script>
+        // tags
+        const tagWrap = document.createElement('div'); tagWrap.className='tags-inline';
+        (r.interests||[]).slice(0,5).forEach(i=>{
+          const t = document.createElement('div'); t.className='tag'; t.innerText = i; tagWrap.appendChild(t);
+        });
+        (r.skills||[]).slice(0,5).forEach(s=>{
+          const t = document.createElement('div'); t.className='tag'; t.innerText = s; tagWrap.appendChild(t);
+        });
+        card.appendChild(tagWrap);
 
+        // points & progress
+        const totalPoints = (r.steps || []).reduce((s,st)=> s + (st.points || 10), 0);
+        const earned = r.pointsEarned || 0;
+        const pct = totalPoints === 0 ? 0 : Math.min(100, Math.round((earned/totalPoints)*100));
+        const pointsDiv = document.createElement('div'); pointsDiv.className='small'; pointsDiv.style.marginTop='8px';
+        pointsDiv.innerText = `Points: ${earned} / ${totalPoints}`;
+        card.appendChild(pointsDiv);
+        const prog = document.createElement('div'); prog.className='progress-wrap'; prog.innerHTML = `<div class="progress-fill" style="width:${pct}%"></div>`;
+        card.appendChild(prog);
+
+        // steps with checkboxes
+        const stepsWrap = document.createElement('div'); stepsWrap.className='steps'; stepsWrap.style.marginTop='10px';
+        (r.steps || []).forEach((st, idx)=>{
+          const stEl = document.createElement('div'); stEl.className='step' + (st.done? ' done':'');
+          // left: checkbox + title
+          const left = document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='10px';
+          const cb = document.createElement('input'); cb.type='checkbox'; cb.checked = !!st.done;
+          cb.onchange = (e) => {
+            st.done = e.target.checked;
+            // update points
+            if(st.done){
+              r.pointsEarned = (r.pointsEarned || 0) + (st.points || 10);
+            } else {
+              r.pointsEarned = Math.max(0, (r.pointsEarned || 0) - (st.points || 10));
+            }
+            saveAll();
+          };
+          const titleWrap = document.createElement('div');
+          titleWrap.innerHTML = `<strong>${st.title}</strong><div class="small">${st.desc || ''}</div>`;
+          left.appendChild(cb); left.appendChild(titleWrap);
+
+          // right: points / duration
+          const right = document.createElement('div'); right.style.textAlign='right';
+          right.innerHTML = `<div class="small">+${st.points || 10} pts</div><div class="small">${st.duration || ''}</div>`;
+
+          stEl.appendChild(left); stEl.appendChild(right);
+          stepsWrap.appendChild(stEl);
+        });
+
+        card.appendChild(stepsWrap);
+
+        // actions
+        const actions = document.createElement('div'); actions.className='actions';
+        const edit = document.createElement('button'); edit.className='btn ghost'; edit.innerText='Edit'; edit.onclick = ()=>editRoadmap(r.id);
+        const del = document.createElement('button'); del.className='btn'; del.innerText='Delete'; del.onclick = ()=>{ if(confirm('Delete?')) { deleteRoadmap(r.id); } };
+        const exportBtn = document.createElement('button'); exportBtn.className='btn'; exportBtn.innerText='Export JSON'; exportBtn.onclick = ()=>downloadSingle(r);
+        const preview = document.createElement('button'); preview.className='btn ghost'; preview.innerText='AI Payload'; preview.onclick = ()=>openModalFor(r);
+        actions.appendChild(edit); actions.appendChild(del); actions.appendChild(exportBtn); actions.appendChild(preview);
+        card.appendChild(actions);
+
+        list.appendChild(card);
+      });
+    }
+
+    function markStep(roadmapId, idx){
+      const r = roadmaps.find(x=>x.id===roadmapId);
+      if(!r) return;
+      r.steps[idx].done = true;
+      r.pointsEarned = (r.pointsEarned || 0) + (r.steps[idx].points || 10);
+      saveAll();
+    }
+
+    function deleteRoadmap(id){
+      roadmaps = roadmaps.filter(r=>r.id!==id);
+      saveAll();
+    }
+
+    function editRoadmap(id){
+      const r = roadmaps.find(x=>x.id===id);
+      if(!r) return alert('Not found');
+      // populate form for quick edit (basic fields)
+      document.getElementById('r_goal').value = r.goal;
+      document.getElementById('r_year').value = r.year;
+      document.getElementById('r_branch').value = r.branch;
+      document.getElementById('r_domain').value = r.domain;
+      document.getElementById('r_interests').value = (r.interests||[]).join(', ');
+      document.getElementById('r_weekly_hours').value = r.weeklyHours;
+      document.getElementById('r_target_weeks').value = r.targetWeeks;
+      document.getElementById('r_skills').value = (r.skills||[]).join(', ');
+      document.getElementById('r_priority').value = (r.priority||[]).join(', ');
+      document.getElementById('r_skill_levels').value = JSON.stringify(r.skillLevels || {});
+      document.getElementById('r_style').value = r.style||'projects';
+      document.getElementById('r_constraints').value = r.constraints||'';
+      // remove existing and replace with edited one (user will re-create)
+      deleteRoadmap(id);
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    function downloadSingle(r){
+      const blob = new Blob([JSON.stringify(r, null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=`roadmap-${r.id}.json`; a.click(); URL.revokeObjectURL(url);
+    }
+
+    function exportAll(){
+      const blob = new Blob([JSON.stringify(roadmaps, null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=`roadmaps-all.json`; a.click(); URL.revokeObjectURL(url);
+    }
+
+    // Modal for AI payload
+    function openModalFor(r){
+      const payload = buildAIPayload(r);
+      document.getElementById('modalContent').innerText = JSON.stringify(payload, null, 2);
+      document.getElementById('modal').style.display = 'flex';
+      window.currentAIPayload = payload;
+      window.currentAIPayloadSourceId = r.id;
+    }
+    function closeModal(){ document.getElementById('modal').style.display='none'; window.currentAIPayload=null; window.currentAIPayloadSourceId=null; }
+    function copyPayload(){ if(window.currentAIPayload) { navigator.clipboard.writeText(JSON.stringify(window.currentAIPayload, null, 2)); alert('Copied payload'); } }
+
+    // Build structured payload suitable to send to Gemini
+    function buildAIPayload(r){
+      return {
+        metadata: {
+          source: 'EduSetu-SmartRoadmap',
+          createdAt: r.createdAt,
+          goal: r.goal,
+          year: r.year,
+          branch: r.branch,
+          domain: r.domain,
+          interests: r.interests,
+          constraints: r.constraints,
+          weeklyHours: r.weeklyHours,
+          targetWeeks: r.targetWeeks,
+          style: r.style,
+        },
+        skills: r.skills,
+        priority: r.priority,
+        skillLevels: r.skillLevels,
+        autoSteps: r.steps.map(s => ({ title:s.title, desc:s.desc, duration:s.duration, startWeek:s.startWeek, endWeek:s.endWeek })),
+        ask: `Please refine this roadmap into a detailed week-by-week plan, returning a JSON array named "refinedSteps" where each item is { title, desc, duration, points }. Prefer free resources, short projects, and assessment checkpoints. Respond with valid JSON where possible.`
+      };
+    }
+
+    // Send to AI (calls server endpoint /api/ai-suggest)
+    async function sendToAI(){
+      if(!window.currentAIPayload) return alert('No payload to send');
+      try{
+        const res = await fetch('/api/ai-suggest', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(window.currentAIPayload) });
+        const data = await res.json();
+        // If server returns refinedSteps (preferred), use it; else try to parse suggestions text
+        let steps = null;
+        if(data.refinedSteps && Array.isArray(data.refinedSteps)){
+          steps = data.refinedSteps.map(s => ({ title: s.title || s.heading || s.step || 'Step', desc: s.desc || s.description || '', duration: s.duration || '', points: s.points || 10, done:false }));
+        } else if(data.suggestions && typeof data.suggestions === 'string'){
+          // try to parse lines that look like "- Step: ..." or "1. ..."
+          steps = parseStepsFromText(data.suggestions);
+        } else if(data.output && typeof data.output === 'string'){
+          steps = parseStepsFromText(data.output);
+        } else {
+          // fallback: show raw response
+          document.getElementById('modalContent').innerText = JSON.stringify(data, null, 2);
+        }
+
+        if(steps && steps.length){
+          // create a new roadmap entry based on source but with AI steps
+          const src = roadmaps.find(r => r.id === window.currentAIPayloadSourceId) || {};
+          const newRoadmap = {
+            id: Date.now(),
+            goal: src.goal ? (src.goal + ' — AI Refined') : ('AI Roadmap ' + Date.now()),
+            year: src.year || 'grad',
+            branch: src.branch || '',
+            domain: src.domain || (src.domain || ''),
+            interests: src.interests || [],
+            weeklyHours: src.weeklyHours || window.currentAIPayload?.metadata?.weeklyHours || 10,
+            targetWeeks: src.targetWeeks || window.currentAIPayload?.metadata?.targetWeeks || 12,
+            skills: src.skills || [],
+            priority: src.priority || [],
+            skillLevels: src.skillLevels || {},
+            style: src.style || 'mixed',
+            constraints: src.constraints || '',
+            steps: steps,
+            pointsEarned: 0,
+            createdAt: new Date().toISOString()
+          };
+          // prefill points property if missing
+          newRoadmap.steps = newRoadmap.steps.map(s => ({ title: s.title, desc: s.desc || '', duration: s.duration || '', points: s.points || 10, done:false }));
+
+          roadmaps.unshift(newRoadmap);
+          saveAll();
+          closeModal();
+          alert('AI-refined roadmap created (with checkboxes). Each step has points — tick to earn them.');
+        } else {
+          // show AI output raw
+          document.getElementById('modalContent').innerText = data.suggestions || data.output || JSON.stringify(data, null, 2);
+        }
+
+      } catch(err){
+        alert('AI request failed: ' + err.message);
+      }
+    }
+
+    // best-effort parse
+    function parseStepsFromText(txt){
+      const lines = txt.split('\n').map(l=>l.trim()).filter(Boolean);
+      const steps = [];
+      for(const line of lines){
+        // handle numbered lines "1. Title - desc"
+        let m = line.match(/^\d+\.\s*(.+)/);
+        let raw = m ? m[1] : line.replace(/^-+\s*/, '');
+        // split by ":" or " - " to get title/desc
+        let parts = raw.split(/\s*[-:]\s*/);
+        const title = parts[0].slice(0,180);
+        const desc = parts.slice(1).join(' - ').slice(0,800);
+        steps.push({ title, desc, duration:'', points:10 });
+      }
+      return steps;
+    }
+
+    // Init
+    document.getElementById('search').addEventListener('input', renderList);
+    renderList();
+
+    // Expose saveAll to window for debugging
+    window.saveAll = saveAll;
+  </script>
 </body>
 </html>

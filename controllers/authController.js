@@ -23,9 +23,7 @@ exports.roadmapPage = (req, res) => {
 exports.hackthonPage = (req, res) => {
   res.render("hackthon"); 
 };
-exports.progressPage = (req, res) => {
-  res.render("progress"); 
-};
+
 exports.chatPage = (req, res) => {
   res.render("chat"); 
 };

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const fetch = require("node-fetch");
+
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 router.post("/run-code", async (req, res) => {
     try {
@@ -10,18 +11,19 @@ router.post("/run-code", async (req, res) => {
             method: "POST",
             headers: {
                 "content-type": "application/json",
+                "accept": "application/json",
                 "X-RapidAPI-Key": process.env.RAPID_API_KEY,
                 "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
             },
             body: JSON.stringify({
-                language_id: lang,
+                language_id: Number(lang),
                 source_code: code
             })
         });
 
         const result = await submission.json();
 
-        const output = result.stdout || result.stderr || result.compile_output || "No output";
+        const output = result.stdout || result.stderr || result.compile_output || result.message || "No output";
 
         res.json({ output });
 
