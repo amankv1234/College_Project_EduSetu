@@ -66,19 +66,10 @@
       <h3 class="text-lg font-semibold mb-3">⚙️ Settings</h3>
 
       <label>Model</label>
-      <select id="model" class="w-full p-2 mt-1 rounded bg-white/10">
-        <option value="gemini-pro">Gemini Pro (recommended)</option>
-        <option value="gemini-1.5-flash">Gemini Flash</option>
-      </select>
-
-      <label class="mt-4 block">Temperature: <span id="tempVal">0.7</span></label>
-      <input id="temp" type="range" min="0" max="1" value="0.7" step="0.1" class="w-full">
-
-      <!-- Memory toggle -->
-      <div class="flex items-center gap-2 mt-4">
-        <input id="memoryToggle" type="checkbox" class="w-4 h-4">
-        <label for="memoryToggle">Enable Memory (future backend)</label>
-      </div>
+      <select id="model" >
+  <option value="gemini-2.5-flash">Gemini Flash</option>
+  <option value="gemini-1.5-pro" >Gemini Pro</option>
+</select>
 
       <!-- STATS -->
       <p class="text-xs opacity-80 mt-4">Messages: <span id="msgCount">0</span></p>
@@ -88,13 +79,6 @@
         <button id="clear" class="flex-1 p-2 bg-red-500 rounded">Clear</button>
         <button id="download" class="flex-1 p-2 bg-emerald-600 rounded">Download</button>
       </div>
-    </div>
-
-    <!-- FILE UPLOAD -->
-    <div class="glass p-5 text-white">
-      <h3 class="font-semibold text-lg mb-2">📄 Upload Document (UI only)</h3>
-      <input id="fileInput" type="file" class="text-white/90">
-      <p class="text-xs mt-2 opacity-80">Upload PDF/DOC for AI (backend later)</p>
     </div>
 
   </section>
@@ -135,22 +119,32 @@
 
 
 <!-- ---------------- HISTORY DRAWER ---------------- -->
-<div id="drawer" class="fixed top-0 right-0 h-full w-80 bg-slate-800 text-white p-5 hidden shadow-xl">
-  <h3 class="font-semibold text-lg">Conversation History</h3>
+<div id="drawer" class="fixed top-0 right-0 h-full w-80 bg-slate-800 text-white p-5 hidden shadow-xl z-50">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="font-semibold text-lg">Conversation History</h3>
+
+    <!-- CLOSE BUTTON -->
+    <button id="closeDrawer" class="text-xl hover:text-red-400">
+      ✕
+    </button>
+  </div>
+
   <ul id="historyList" class="mt-4 space-y-2 text-sm"></ul>
 </div>
+
 
 
 
 <script>
 
 /* ---------------- GEMINI API FUNCTION ---------------- */
-async function getGeminiResponse(prompt, model, temperature) {
+async function getGeminiResponse(prompt, model) {
   const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
 
   const body = {
     contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: { temperature: Number(temperature) }
   };
 
   try {
@@ -160,7 +154,13 @@ async function getGeminiResponse(prompt, model, temperature) {
       body: JSON.stringify(body)
     });
 
-    const data = await res.json();
+   const data = await res.json();
+console.log("GEMINI RESPONSE:", data);
+
+if (data.error) {
+  return "❌ Gemini Error: " + data.error.message;
+}
+
     return (
       data.candidates?.[0]?.content?.parts?.[0]?.text ||
       "⚠️ No response from Gemini model."
@@ -232,7 +232,9 @@ function showTyping(){
   });
 }
 
+
 /* -------------- HANDLE SEND MESSAGE --------------- */
+
 document.getElementById("chatForm").addEventListener("submit", async(e)=>{
   e.preventDefault();
   const text=input.value.trim();
@@ -244,9 +246,7 @@ document.getElementById("chatForm").addEventListener("submit", async(e)=>{
   await showTyping();
 
   const model = document.getElementById("model").value;
-  const temp = document.getElementById("temp").value;
-
-  const reply = await getGeminiResponse(text, model, temp);
+  const reply = await getGeminiResponse(text, model);
 
   addMsg("assistant", reply);
 });
@@ -268,13 +268,23 @@ document.getElementById("download").onclick=()=>{
 };
 
 /* HISTORY DRAWER */
-document.getElementById("historyBtn").onclick=()=>{
-  drawer.classList.toggle("hidden");
-  document.getElementById("historyList").innerHTML="";
-  document.querySelectorAll(".bubble").forEach(b=>{
-    const li=document.createElement("li");
-    li.textContent=b.innerText.slice(0,50)+"...";
-    document.getElementById("historyList").appendChild(li);
+
+const closeDrawerBtn = document.getElementById("closeDrawer");
+
+closeDrawerBtn.onclick = () => {
+  drawer.classList.add("hidden");
+};
+const historyBtn = document.getElementById("historyBtn");
+const historyList = document.getElementById("historyList");
+
+historyBtn.onclick = () => {
+  drawer.classList.remove("hidden");
+  historyList.innerHTML = "";
+
+  document.querySelectorAll(".bubble").forEach(bubble => {
+    const li = document.createElement("li");
+    li.textContent = bubble.innerText.slice(0, 60) + "...";
+    historyList.appendChild(li);
   });
 };
 

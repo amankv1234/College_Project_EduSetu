@@ -1,153 +1,230 @@
 <%- include("partials/navbar") %>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-  /* Container & Heading */
-  .container {
-    max-width: 1200px;
-    margin: auto;
-    margin-top: 50px;
-    padding: 20px;
-  }
+:root{
+  --bg:#020617;
+  --card:#0f172a;
+  --border:#1e293b;
+  --accent:#38bdf8;
+  --accent2:#22c55e;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background:radial-gradient(circle at top,#0f172a,#020617);
+  color:var(--text);
+}
 
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 2rem;
-    color: #333;
-  }
+.container{
+  max-width:1400px;
+  margin:auto;
+  padding:40px 20px 80px;
+}
 
-  /* Search / Filter Input */
-  .filter-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
+.hero{
+  text-align:center;
+  margin-bottom:40px;
+}
+.hero h2{
+  font-size:clamp(2rem,4vw,2.8rem);
+  font-weight:800;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.hero p{
+  max-width:720px;
+  margin:10px auto 0;
+  color:var(--muted);
+}
 
-  #filterInput {
-    width: 300px;
-    padding: 10px 15px;
-    border-radius: 25px;
-    border: 1px solid #ccc;
-    outline: none;
-    font-size: 1rem;
-    transition: all 0.3s;
-  }
+/* SEARCH + FILTERS */
+.filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+  justify-content:center;
+  margin:40px 0;
+}
+.filters input,
+.filters select{
+  padding:12px 18px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:#020617;
+  color:var(--text);
+  min-width:220px;
+}
+.filters input:focus,
+.filters select:focus{
+  outline:none;
+  border-color:var(--accent);
+}
 
-  #filterInput:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0,123,255,0.5);
-  }
+/* GRID */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:30px;
+}
+@media(max-width:1100px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.cards-grid{grid-template-columns:1fr}}
 
-  /* Cards Grid */
-  .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-  }
+/* CARD */
+.card{
+  background:linear-gradient(180deg,#0b1220,#020617);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:26px;
+  min-height:260px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+  transition:.35s ease;
+}
+.card:hover{
+  transform:translateY(-10px);
+  box-shadow:0 30px 60px rgba(0,0,0,.6);
+  border-color:var(--accent);
+}
 
-  /* Card */
-  .card {
-    padding: 20px;
-    background: linear-gradient(145deg, #f0f0f0, #ffffff);
-    border-radius: 16px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+.tag{
+  position:absolute;
+  top:20px;right:20px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:.7rem;
+  background:#38bdf822;
+  color:var(--accent);
+}
 
-  .card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-  }
+.card h3{
+  font-size:1.4rem;
+  margin:0 0 10px;
+}
+.card p{
+  color:var(--muted);
+  line-height:1.6;
+  flex-grow:1;
+}
 
-  .card h3 {
-    font-size: 1.3rem;
-    color: #333;
-    margin-bottom: 10px;
-  }
+.meta{
+  display:flex;
+  justify-content:space-between;
+  font-size:.8rem;
+  color:var(--muted);
+  margin:15px 0;
+}
 
-  .card p {
-    font-size: 0.95rem;
-    color: #555;
-    flex-grow: 1;
-  }
+.actions{
+  display:flex;
+  gap:12px;
+}
+.actions a,
+.actions button{
+  flex:1;
+  padding:12px;
+  border-radius:14px;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+}
+.actions a{
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#020617;
+  text-decoration:none;
+  text-align:center;
+}
+.actions button{
+  background:#020617;
+  color:var(--accent);
+  border:1px solid var(--accent);
+}
+.actions button:hover{
+  background:var(--accent);
+  color:#020617;
+}
 
-  .card a {
-    margin-top: 15px;
-    text-decoration: none;
-    font-weight: bold;
-    color: #fff;
-    background: #007bff;
-    text-align: center;
-    padding: 10px;
-    border-radius: 8px;
-    transition: all 0.3s;
-  }
-
-  .card a:hover {
-    background: #0056b3;
-  }
-
-  @media(max-width: 500px){
-    #filterInput {
-      width: 90%;
-    }
-  }
+.empty{
+  text-align:center;
+  color:var(--muted);
+  grid-column:1/-1;
+}
 </style>
 
 <div class="container">
-  <h2>🔥 Live Opportunities </h2>
 
-  <div class="filter-container">
-    <input type="text" id="filterInput" placeholder="Search by title or description...">
+  <div class="hero">
+    <h2>Live Opportunities</h2>
+    <p>Internships, Hackathons & Jobs curated for your growth on EduSetu</p>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="search" placeholder="Search by role, skill, company">
+    <select id="type">
+      <option value="">All Types</option>
+      <option value="Internship">Internship</option>
+      <option value="Hackathon">Hackathon</option>
+      <option value="Job">Job</option>
+    </select>
+    <select id="level">
+      <option value="">All Levels</option>
+      <option value="Beginner">Beginner</option>
+      <option value="Intermediate">Intermediate</option>
+    </select>
   </div>
 
   <div id="cards" class="cards-grid"></div>
 </div>
 
 <script>
-  let allData = [];
+let allData=[];
 
-  async function loadData() {
-    try {
-      const res = await fetch("/opportunities/static");
-      allData = await res.json();
-      renderCards(allData);
-    } catch (err) {
-      console.error("Error loading data:", err);
-      document.getElementById("cards").innerHTML = "<p style='color:red;text-align:center;'>Failed to load opportunities</p>";
-    }
-  }
+async function loadData(){
+  const res=await fetch('/opportunities/static');
+  allData=await res.json();
+  render(allData);
+}
 
-  function renderCards(data) {
-    let html = "";
-    if(data.length === 0){
-      html = "<p style='text-align:center;'>No opportunities found</p>";
-    } else {
-      data.forEach(item => {
-        html += `
-          <div class="card">
-            <h3>${item.title}</h3>
-            <p>${item.description}</p>
-            <a href="${item.link}" target="_blank">View →</a>
-          </div>
-        `;
-      });
-    }
-    document.getElementById("cards").innerHTML = html;
-  }
+function render(data){
+  const cards=document.getElementById('cards');
+  if(!data.length){cards.innerHTML='<div class="empty">No opportunities found</div>';return}
+  cards.innerHTML=data.map(o=>`
+    <div class="card">
+      <span class="tag">${o.type||'Opportunity'}</span>
+      <h3>${o.title}</h3>
+      <p>${o.description}</p>
+      <div class="meta">
+        <span>⏳ ${o.duration||'Flexible'}</span>
+        <span>⭐ ${o.level||'All Levels'}</span>
+      </div>
+      <div class="actions">
+        <a href="${o.link}" target="_blank">View Details</a>
+        <button onclick="save()">☆ Save</button>
+      </div>
+    </div>`).join('');
+}
 
-  // Filter functionality
-  document.getElementById("filterInput").addEventListener("input", (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    const filtered = allData.filter(item => 
-      item.title.toLowerCase().includes(searchTerm) || 
-      item.description.toLowerCase().includes(searchTerm)
-    );
-    renderCards(filtered);
-  });
+function applyFilter(){
+  const s=search.value.toLowerCase();
+  const t=type.value;
+  const l=level.value;
+  const f=allData.filter(o=>(
+    (!t||o.type===t)&&
+    (!l||o.level===l)&&
+    (o.title.toLowerCase().includes(s)||o.description.toLowerCase().includes(s))
+  ));
+  render(f);
+}
 
-  loadData();
+function save(){alert('Saved (frontend only)')}
+
+['search','type','level'].forEach(id=>document.getElementById(id).addEventListener('input',applyFilter));
+loadData();
 </script>

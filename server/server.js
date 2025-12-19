@@ -36,6 +36,9 @@ app.get("/success", (req, res) => {
 app.get("/opportunities", (req, res) => {
     res.render("opportunities");
 });
+app.get("/ai-output", (req,res)=>{
+  res.render("ai-output");
+});
 
 app.use("/", opportunitiesRoutes);
 app.use("/", mainRoutes);

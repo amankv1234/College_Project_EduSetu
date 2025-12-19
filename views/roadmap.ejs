@@ -1,11 +1,4 @@
 <%- include("partials/navbar") %>
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Smart Roadmaps — EduSetu</title>
-
   <style>
     :root{
       --bg1: #0f1724;
@@ -133,19 +126,18 @@
         </div>
 
         <div class="field">
-          <label>Skill list (comma separated, prioritized)</label>
+          <label>Skill list</label>
           <input id="r_skills" type="text" placeholder="e.g., HTML, CSS, JS, React">
         </div>
 
         <div class="field">
-          <label>Priority skills (comma - highest priority first)</label>
+          <label>Priority skills</label>
           <input id="r_priority" type="text" placeholder="e.g., React, DSA">
         </div>
 
         <div class="field">
-          <label>Skill levels (json or CSV) — optional</label>
+          <label>Skill levels</label>
           <input id="r_skill_levels" type="text" placeholder='e.g., {"HTML":"beginner","JS":"intermediate"} or "HTML:beginner,JS:intermediate"'>
-          <div class="small">This helps AI adjust recommended starting points.</div>
         </div>
 
         <div class="field">
@@ -168,9 +160,7 @@
           <button class="btn ghost" onclick="clearForm()">Clear</button>
         </div>
 
-        <div style="margin-top:12px;" class="small">
-          After creating, click "AI Refine" on a roadmap to send structured payload to Gemini. AI output will convert into checkable steps with points.
-        </div>
+        
       </div>
 
       <!-- RIGHT: Roadmaps List -->
@@ -306,9 +296,25 @@
         return;
       }
       shown.forEach(r=>{
-        const card = document.createElement('div'); card.className='card';
-        const h = document.createElement('h4'); h.innerHTML = `<span>${r.goal}</span><span class="small">${r.domain||''}</span>`;
-        card.appendChild(h);
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  // 🔥 AI roadmap highlight
+  if(r.goal && r.goal.includes('AI Refined')){
+    card.style.border = '1px solid #4bd1c6';
+    card.style.boxShadow = '0 0 0 1px rgba(75,209,198,0.3), 0 10px 30px rgba(75,209,198,0.2)';
+  }
+
+  const h = document.createElement('h4');
+  h.innerHTML = `
+    <span>${r.goal}</span>
+    <span class="small">${r.domain || ''}</span>
+    ${r.goal && r.goal.includes('AI Refined') 
+      ? '<span class="tag">AI</span>' 
+      : ''}
+  `;
+  card.appendChild(h);
+
 
         const meta = document.createElement('div'); meta.className='meta small';
         meta.innerHTML = `Year: ${r.year} · Branch: ${r.branch||'—'} · Weekly: ${r.weeklyHours}h · Target: ${r.targetWeeks}w`;
@@ -461,12 +467,22 @@
     async function sendToAI(){
       if(!window.currentAIPayload) return alert('No payload to send');
       try{
-        const res = await fetch('/api/ai-suggest', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(window.currentAIPayload) });
+        const res = await fetch('/api/ai/suggest', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(window.currentAIPayload) });
         const data = await res.json();
+        console.log("AI RESPONSE:", data);
+
         // If server returns refinedSteps (preferred), use it; else try to parse suggestions text
         let steps = null;
-        if(data.refinedSteps && Array.isArray(data.refinedSteps)){
-          steps = data.refinedSteps.map(s => ({ title: s.title || s.heading || s.step || 'Step', desc: s.desc || s.description || '', duration: s.duration || '', points: s.points || 10, done:false }));
+       if (data.success && Array.isArray(data.refinedSteps)) {
+  steps = data.refinedSteps.map(s => ({
+    title: s.title || 'Step',
+    desc: s.desc || '',
+    duration: s.duration || '',
+    points: s.points || 10,
+    done: false
+  }));
+
+
         } else if(data.suggestions && typeof data.suggestions === 'string'){
           // try to parse lines that look like "- Step: ..." or "1. ..."
           steps = parseStepsFromText(data.suggestions);
@@ -505,6 +521,7 @@
           saveAll();
           closeModal();
           alert('AI-refined roadmap created (with checkboxes). Each step has points — tick to earn them.');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           // show AI output raw
           document.getElementById('modalContent').innerText = data.suggestions || data.output || JSON.stringify(data, null, 2);
